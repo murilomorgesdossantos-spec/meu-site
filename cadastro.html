@@ -2,233 +2,198 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Nova Conta</title>
+    <title>Login</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
-    <link rel="stylesheet" href="/style.css">
-    
     <style>
-        /* --- ESTILOS GERAIS --- */
+        /* --- RESET BÁSICO --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* --- FUNDO DA TELA (Sua Imagem Nova) --- */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Link da imagem atualizado aqui */
+            background: url('https://images.hdqwalls.com/wallpapers/bthumb/dark-night-mountains-minimalist-4k-o4.jpg') no-repeat center center/cover;
+            overflow: hidden;
+        }
+
+        /* --- A CAIXA DE LOGIN (Vidro Escuro) --- */
         .caixa-login {
-            width: 350px;
+            width: 400px;
             padding: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            
+            background: rgba(0, 0, 0, 0.5); /* Preto transparente */
+            backdrop-filter: blur(10px);     /* Desfoque */
             -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            
+            border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 15px;
-            text-align: center;
             color: white;
-            margin: auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
         .caixa-login h1 {
-            margin-bottom: 30px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        label {
-            display: block;
-            text-align: left;
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 16px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        input:focus {
-            background: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 10px rgba(255,255,255,0.2);
-        }
-
-        /* --- ESTILOS DOS BOTÕES (Cadastrar e Voltar) --- */
-        
-        /* Aplica estilo de botão tanto para <button> quanto para o link .btn-voltar */
-        button, .btn-voltar {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 50px;
-            background: white;
-            color: #4e54c8;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 15px; /* Espaço entre os botões */
-            
-            /* Faz o link 'a' se comportar como caixa */
-            display: block;
             text-align: center;
-            text-decoration: none;
-            box-sizing: border-box;
+            font-size: 32px;
+            margin-bottom: 30px;
+            font-weight: 600;
         }
 
-        button:hover, .btn-voltar:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        /* Remove a linha embaixo do link apenas no botão voltar */
-        .btn-voltar {
-            border-bottom: none !important;
-        }
-
-        /* Links normais (se houver outros) */
-        a:not(.btn-voltar) {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            border-bottom: 1px solid rgba(255,255,255,0.5);
-        }
-        a:not(.btn-voltar):hover {
-            color: #e0e0e0;
-        }
-
-        /* --- ÍCONES E ERRO --- */
-        .input-com-icone {
+        /* --- INPUTS --- */
+        .input-box {
             position: relative;
             width: 100%;
-            display: flex;
-        }
-        .input-com-icone input {
-            padding-right: 40px; 
-        }
-        .icone-olho {
-            position: absolute;
-            right: 10px;
-            top: 50%; 
-            transform: translateY(-90%);
-            cursor: pointer;
-            color: rgba(255, 255, 255, 0.7);
-            user-select: none;
-            font-size: 20px;
-            z-index: 10;
-        }
-        .icone-olho:hover {
-            color: white;
+            height: 50px;
+            margin-bottom: 20px;
         }
 
-        #msg-erro {
-            color: #ffcccc;
-            font-size: 13px;
-            font-weight: bold;
-            margin-top: -10px;
-            margin-bottom: 15px;
+        .input-box input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 40px;
+            font-size: 16px;
+            color: white;
+            padding: 0 45px 0 20px;
+            outline: none;
+            transition: .3s;
+        }
+
+        .input-box input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .input-box input:focus {
+            border-color: white;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .input-box .icone {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: white;
+        }
+        
+        .input-box .icone-clicavel {
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* --- LEMBRAR & ESQUECI --- */
+        .lembrar-esqueci {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin: -5px 0 20px;
+            padding: 0 10px;
+        }
+
+        .lembrar-esqueci label input {
+            margin-right: 5px;
+            accent-color: white;
+        }
+
+        .lembrar-esqueci a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .lembrar-esqueci a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- BOTÃO DE LOGIN --- */
+        .btn-login {
+            width: 100%;
+            height: 45px;
+            background: white;
+            border: none;
+            outline: none;
+            border-radius: 40px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            font-size: 16px;
+            color: #333;
+            font-weight: 700;
+            transition: .3s;
+        }
+
+        .btn-login:hover {
+            background: #f0f0f0;
+            transform: scale(1.02);
+        }
+
+        /* --- TEXTO DE CADASTRO --- */
+        .registro-link {
+            font-size: 14px;
             text-align: center;
-            display: none;
-            background-color: rgba(255, 0, 0, 0.1);
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid rgba(255, 0, 0, 0.2);
+            margin-top: 25px;
+        }
+
+        .registro-link p a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .registro-link p a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
     <div class="caixa-login">
-        <h1>Criar Conta</h1>
-        
-        <form action="/cadastrar" method="POST" onsubmit="return validarTudo()">
-            <label>Defina seu Usuário</label>
-            <input type="text" id="usuario" name="usuario" placeholder="Seu usuário" required>
+        <form action="/login" method="POST">
+            <h1>Login</h1>
             
-            <label>Crie uma Senha</label>
-            <div class="input-com-icone">
-                <input type="password" id="senha" name="senha" placeholder="Sua senha" required>
-                <span class="material-icons icone-olho" onclick="toggleSenha(this, 'senha')">visibility_off</span>
+            <div class="input-box">
+                <input type="text" name="usuario" placeholder="Username" required>
+                <span class="material-icons icone">person</span>
+            </div>
+            
+            <div class="input-box">
+                <input type="password" id="senha_login" name="senha" placeholder="Password" required>
+                <span class="material-icons icone icone-clicavel" onclick="toggleSenha()">visibility_off</span>
             </div>
 
-            <label>Confirme a Senha</label>
-            <div class="input-com-icone">
-                <input type="password" id="confirma_senha" placeholder="Confirme sua senha" required>
-                <span class="material-icons icone-olho" onclick="toggleSenha(this, 'confirma_senha')">visibility_off</span>
+            <div class="lembrar-esqueci">
+                <label><input type="checkbox"> Remember me</label>
+                <a href="#">Forgot Password?</a>
             </div>
 
-            <div id="msg-erro"></div>
-            
-            <button type="submit">Cadastrar Agora</button>
+            <button type="submit" class="btn-login">Log in</button>
+
+            <div class="registro-link">
+                <p>Don't have an account? <a href="/cadastro">Register</a></p>
+            </div>
         </form>
-        
-        <a href="/" class="btn-voltar">Voltar</a>
-
-    </div>
-
-    <div class="area-animada">
-        <ul style="padding: 0; margin: 0;">
-            <li class="caixa-flutuante"></li><li class="caixa-flutuante"></li><li class="caixa-flutuante"></li>
-            <li class="caixa-flutuante"></li><li class="caixa-flutuante"></li><li class="caixa-flutuante"></li>
-            <li class="caixa-flutuante"></li><li class="caixa-flutuante"></li><li class="caixa-flutuante"></li>
-            <li class="caixa-flutuante"></li>
-        </ul>
     </div>
 
     <script>
-        function toggleSenha(elementoIcone, idCampo) {
-            const campo = document.getElementById(idCampo);
+        function toggleSenha() {
+            const campo = document.getElementById('senha_login');
+            const icone = document.querySelector('.icone-clicavel');
+            
             if (campo.type === "password") {
                 campo.type = "text";
-                elementoIcone.textContent = 'visibility';
+                icone.textContent = 'visibility';
             } else {
                 campo.type = "password";
-                elementoIcone.textContent = 'visibility_off';
+                icone.textContent = 'visibility_off';
             }
-        }
-
-        function validarTudo() {
-            var usuario = document.getElementById("usuario").value;
-            var senha = document.getElementById("senha").value;
-            var confirmacao = document.getElementById("confirma_senha").value;
-            
-            var regraUsuario = /^[a-zA-Z0-9_]+$/;
-
-            if (!regraUsuario.test(usuario)) {
-                mostrarErro("Usuário inválido! Use apenas letras, números e underline (_).");
-                return false;
-            }
-
-            if (senha.includes(" ")) {
-                mostrarErro("A senha não pode conter espaços!");
-                return false;
-            }
-
-            if (senha !== confirmacao) {
-                mostrarErro("As senhas não coincidem!");
-                return false;
-            }
-
-            return true;
-        }
-
-        function mostrarErro(texto) {
-            var caixaErro = document.getElementById("msg-erro");
-            caixaErro.innerText = "⚠️ " + texto;
-            caixaErro.style.display = "block";
-            
-            caixaErro.animate([
-                { transform: 'translateX(-5px)' },
-                { transform: 'translateX(5px)' },
-                { transform: 'translateX(0)' }
-            ], { duration: 300 });
         }
     </script>
 
