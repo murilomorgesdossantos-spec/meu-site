@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true })); // Importante para ler Formulá
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
-    secure: tre,
+    secure: true,
     auth: {
         user: 'murilomorgesdossantos@gmail.com', 
         pass: 'uviq vrwx izkh aoaf' // <--- COLE SUA SENHA DE 16 LETRAS AQUI (Mantenha as aspas)
