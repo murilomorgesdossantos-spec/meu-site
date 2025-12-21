@@ -26,7 +26,7 @@ const transporter = nodemailer.createTransport({
     secure: true,
     auth: {
         user: 'murilomorgesdossantos@gmail.com', 
-        pass: 'uviq vrwx izkh aoaf' // <--- COLE SUA SENHA DE 16 LETRAS AQUI (Mantenha as aspas)
+        pass: process.env.EMAIL_PASSWORD
     },
     tls: {
         rejectUnauthorized: false // Ajuda a passar pelo firewall do Render
