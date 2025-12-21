@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/style.css">
     
     <style>
-        /* --- ESTILOS (Mesmos do Login) --- */
+        /* --- ESTILOS GERAIS --- */
         .caixa-login {
             width: 350px;
             padding: 40px;
@@ -60,7 +60,10 @@
             box-shadow: 0 0 10px rgba(255,255,255,0.2);
         }
 
-        button {
+        /* --- ESTILOS DOS BOTÕES (Cadastrar e Voltar) --- */
+        
+        /* Aplica estilo de botão tanto para <button> quanto para o link .btn-voltar */
+        button, .btn-voltar {
             width: 100%;
             padding: 12px;
             border: none;
@@ -71,36 +74,45 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
-            margin-top: 10px;
+            margin-top: 15px; /* Espaço entre os botões */
+            
+            /* Faz o link 'a' se comportar como caixa */
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            box-sizing: border-box;
         }
 
-        button:hover {
+        button:hover, .btn-voltar:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        a {
+        /* Remove a linha embaixo do link apenas no botão voltar */
+        .btn-voltar {
+            border-bottom: none !important;
+        }
+
+        /* Links normais (se houver outros) */
+        a:not(.btn-voltar) {
             color: white;
             text-decoration: none;
             font-weight: bold;
             border-bottom: 1px solid rgba(255,255,255,0.5);
         }
-
-        a:hover {
+        a:not(.btn-voltar):hover {
             color: #e0e0e0;
         }
 
-        /* --- ESTILOS DO OLHO E ERRO --- */
+        /* --- ÍCONES E ERRO --- */
         .input-com-icone {
             position: relative;
             width: 100%;
             display: flex;
         }
-
         .input-com-icone input {
             padding-right: 40px; 
         }
-
         .icone-olho {
             position: absolute;
             right: 10px;
@@ -112,7 +124,6 @@
             font-size: 20px;
             z-index: 10;
         }
-        
         .icone-olho:hover {
             color: white;
         }
@@ -139,17 +150,17 @@
         
         <form action="/cadastrar" method="POST" onsubmit="return validarTudo()">
             <label>Defina seu Usuário</label>
-            <input type="text" id="usuario" name="usuario" placeholder="Letras, números e _" required>
+            <input type="text" id="usuario" name="usuario" placeholder="Seu usuário" required>
             
             <label>Crie uma Senha</label>
             <div class="input-com-icone">
-                <input type="password" id="senha" name="senha" placeholder="Sua senha secreta" required>
+                <input type="password" id="senha" name="senha" placeholder="Sua senha" required>
                 <span class="material-icons icone-olho" onclick="toggleSenha(this, 'senha')">visibility_off</span>
             </div>
 
             <label>Confirme a Senha</label>
             <div class="input-com-icone">
-                <input type="password" id="confirma_senha" placeholder="Digite a senha novamente" required>
+                <input type="password" id="confirma_senha" placeholder="Confirme sua senha" required>
                 <span class="material-icons icone-olho" onclick="toggleSenha(this, 'confirma_senha')">visibility_off</span>
             </div>
 
@@ -158,9 +169,8 @@
             <button type="submit">Cadastrar Agora</button>
         </form>
         
-        <p style="margin-top: 20px; font-size: 13px;">
-            <a href="/">← Voltar para Login</a>
-        </p>
+        <a href="/" class="btn-voltar">Voltar</a>
+
     </div>
 
     <div class="area-animada">
@@ -189,26 +199,18 @@
             var senha = document.getElementById("senha").value;
             var confirmacao = document.getElementById("confirma_senha").value;
             
-            // ATENÇÃO AQUI: Adicionei o underline (_) na regra
-            // a-z = letras minúsculas
-            // A-Z = letras maiúsculas
-            // 0-9 = números
-            // _   = underline permitido
             var regraUsuario = /^[a-zA-Z0-9_]+$/;
 
-            // 1. Validar Usuário
             if (!regraUsuario.test(usuario)) {
                 mostrarErro("Usuário inválido! Use apenas letras, números e underline (_).");
                 return false;
             }
 
-            // 2. Validar Senha (Sem espaço)
             if (senha.includes(" ")) {
                 mostrarErro("A senha não pode conter espaços!");
                 return false;
             }
 
-            // 3. Validar se as senhas conferem
             if (senha !== confirmacao) {
                 mostrarErro("As senhas não coincidem!");
                 return false;

@@ -8,19 +8,15 @@
     <link rel="stylesheet" href="/style.css">
     
     <style>
-        /* --- ESTILOS DO FORMULÁRIO (Igual ao Cadastro) --- */
-        
+        /* --- ESTILOS GERAIS --- */
         .caixa-login {
             width: 350px;
             padding: 40px;
-            
-            /* Efeito de Vidro */
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            
             border-radius: 15px;
             text-align: center;
             color: white;
@@ -64,7 +60,10 @@
             box-shadow: 0 0 10px rgba(255,255,255,0.2);
         }
 
-        button {
+        /* --- ESTILOS DOS BOTÕES (Entrar e Cadastrar) --- */
+        
+        /* Agora essa regra se aplica ao <button> e ao link com classe .btn-cadastro */
+        button, .btn-cadastro {
             width: 100%;
             padding: 12px;
             border: none;
@@ -75,49 +74,58 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
-            margin-top: 10px;
+            margin-top: 15px; /* Aumentei um pouco o espaço entre eles */
+            
+            /* Propriedades extras para o link 'a' se comportar como botão */
+            display: block;        /* Ocupa a largura toda */
+            text-align: center;    /* Centraliza o texto */
+            text-decoration: none; /* Remove o sublinhado padrão de link */
+            box-sizing: border-box; /* Garante que o padding não aumente a largura */
         }
 
-        button:hover {
+        /* Efeito Hover para ambos */
+        button:hover, .btn-cadastro:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        a {
+        /* Remove a borda inferior padrão dos links apenas para o botão de cadastro */
+        .btn-cadastro {
+            border-bottom: none !important;
+        }
+
+        /* Estilo para links normais (caso adicione outros no futuro) */
+        a:not(.btn-cadastro) {
             color: white;
             text-decoration: none;
             font-weight: bold;
             border-bottom: 1px solid rgba(255,255,255,0.5);
         }
-
-        a:hover {
+        a:not(.btn-cadastro):hover {
             color: #e0e0e0;
         }
 
-        /* --- ESTILOS DO ÍCONE DE OLHO --- */
 
+        /* --- ESTILOS DO ÍCONE DE OLHO --- */
         .input-com-icone {
             position: relative;
             width: 100%;
             display: flex;
         }
-
         .input-com-icone input {
             padding-right: 40px; 
         }
-
         .icone-olho {
             position: absolute;
             right: 10px;
             top: 50%; 
-            transform: translateY(-90%); /* Centralização vertical ajustada */
+            transform: translateY(-90%);
             cursor: pointer;
             color: rgba(255, 255, 255, 0.7);
             user-select: none;
             font-size: 20px;
             z-index: 10;
         }
-        
         .icone-olho:hover {
             color: white;
         }
@@ -141,10 +149,8 @@
             <button type="submit">Entrar</button>
         </form>
 
-        <p style="margin-top: 20px; font-size: 13px;">
-            Ainda não tem acesso? <br>
-            <a href="/cadastro">Criar conta grátis</a>
-        </p>
+        <a href="/cadastro" class="btn-cadastro">Cadastrar</a>
+
     </div>
 
     <div class="area-animada">
