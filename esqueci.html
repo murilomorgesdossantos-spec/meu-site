@@ -2,159 +2,123 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Recuperar Conta</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitação de Ajuda</title>
     <style>
-        /* --- ESTILOS IGUAIS AO LOGIN --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        
         body {
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            background: url('https://images.hdqwalls.com/wallpapers/bthumb/dark-night-mountains-minimalist-4k-o4.jpg') no-repeat center center/cover;
-            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-
-        .caixa-login {
-            width: 450px; /* Um pouco mais largo para caber os detalhes */
-            padding: 40px;
-            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 15px;
-            color: white; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        .container {
+            background-color: #111;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
         }
-
-        .caixa-login h1 { text-align: center; font-size: 28px; margin-bottom: 20px; font-weight: 600; }
-        .descricao { text-align: center; font-size: 13px; margin-bottom: 20px; color: #ddd; }
-
-        /* --- INPUTS --- */
-        .input-box { position: relative; width: 100%; margin-bottom: 15px; }
-        
-        .input-box input, .input-box textarea {
-            width: 100%; background: transparent;
-            border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 10px; /* Borda menos redonda para combinar com textarea */
-            font-size: 15px; color: white; padding: 12px 15px; outline: none; transition: .3s;
+        h2 { margin-bottom: 10px; }
+        p { color: #ccc; font-size: 14px; margin-bottom: 20px; }
+        .input-group { text-align: left; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background-color: #e8f0fe;
+            color: #000;
+            box-sizing: border-box;
         }
-        
-        /* Ajuste específico para a caixa de texto grande */
-        .input-box textarea {
-            height: 80px; resize: none; font-family: 'Poppins', sans-serif;
+        textarea {
+            background-color: #1a1a1a;
+            color: #fff;
+            height: 100px;
+            resize: none;
+            border: 1px solid #333;
         }
-
-        .input-box label {
-            font-size: 13px; color: rgba(255, 255, 255, 0.8); margin-bottom: 5px; display: block;
+        button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 25px;
+            border: none;
+            background-color: #fff;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.3s;
         }
-
-        .input-box input:focus, .input-box textarea:focus {
-            border-color: white; box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        button:hover { background-color: #ddd; }
+        .back-link {
+            display: block;
+            margin-top: 15px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
         }
-
-        /* --- BOTÕES --- */
-        .btn-enviar {
-            width: 100%; height: 45px; background: white; border: none; outline: none;
-            border-radius: 40px; cursor: pointer; font-size: 16px; color: #333; font-weight: 700;
-            transition: .3s; margin-top: 10px;
-        }
-        .btn-enviar:hover { background: #f0f0f0; transform: scale(1.02); }
-
-        .btn-voltar {
-            display: block; text-align: center; margin-top: 15px; color: white; text-decoration: none; font-size: 14px;
-        }
-        .btn-voltar:hover { text-decoration: underline; }
-
-        /* --- MENSAGENS --- */
-        #status-msg {
-            display: none; padding: 10px; border-radius: 10px; margin-bottom: 15px;
-            text-align: center; font-size: 14px; font-weight: 600;
-        }
-        .sucesso { background-color: rgba(0, 255, 0, 0.2); border: 1px solid #0f0; color: #ccffcc; }
-        .erro { background-color: rgba(255, 0, 0, 0.2); border: 1px solid #f00; color: #ffcccc; }
-
     </style>
 </head>
 <body>
 
-    <div class="caixa-login">
-        <h1>Solicitação de Ajuda</h1>
-        <p class="descricao">Preencha os dados abaixo para recuperarmos sua conta.</p>
+<div class="container">
+    <h2>Solicitação de Ajuda</h2>
+    <p>Informe seus dados para recuperar o acesso à sua conta.</p>
 
-        <form id="form-esqueci" onsubmit="enviarPedido(event)">
-            
-            <div id="status-msg"></div>
-
-            <div class="input-box">
-                <label>Qual seu nome completo?</label>
-                <input type="text" id="nome_completo" placeholder="Insira seu nome" required>
-            </div>
-
-            <div class="input-box">
-                <label>Qual seu usuário?</label>
-                <input type="text" id="usuario_rec" placeholder="Insira seu usuário (caso lembre)" required>
-            </div>
-
-            <div class="input-box">
-                <label>Email para contato</label>
-                <input type="email" id="email_contato" placeholder="Qual seu endereço de email?" required>
-            </div>
-
-            <div class="input-box">
-                <label>Detalhes</label>
-                <textarea id="detalhes" placeholder="Dê mais detalhes sobre sua conta..." required></textarea>
-            </div>
-
-            <button type="submit" class="btn-enviar" id="btn-submit">Enviar Solicitação</button>
-            <a href="/" class="btn-voltar">Voltar para o Login</a>
-        </form>
+    <div class="input-group">
+        <label>Qual seu nome completo?</label>
+        <input type="text" id="nome" placeholder="Digite seu nome">
     </div>
 
-    <script>
-        async function enviarPedido(event) {
-            event.preventDefault();
+    <div class="input-group">
+        <label>Qual seu usuário no sistema?</label>
+        <input type="text" id="usuario" placeholder="Digite seu usuário">
+    </div>
 
-            const btn = document.getElementById('btn-submit');
-            const status = document.getElementById('status-msg');
-            
-            // Efeito de "Carregando"
-            btn.innerText = "Enviando...";
-            btn.disabled = true;
-            status.style.display = 'none';
+    <div class="input-group">
+        <label>Detalhes do problema</label>
+        <textarea id="detalhes" placeholder="Ex: Esqueci minha senha e gostaria de resetar..."></textarea>
+    </div>
 
-            const dados = {
-                nome: document.getElementById('nome_completo').value,
-                usuario: document.getElementById('usuario_rec').value,
-                email: document.getElementById('email_contato').value,
-                detalhes: document.getElementById('detalhes').value
-            };
+    <button type="button" onclick="enviarParaWhatsApp()" id="btnEnviar">Enviar via WhatsApp</button>
 
-            try {
-                const response = await fetch('/enviar-ajuda', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dados)
-                });
+    <a href="/" class="back-link">Voltar para o Login</a>
+</div>
 
-                const result = await response.json();
+<script>
+    function enviarParaWhatsApp() {
+        const nome = document.getElementById('nome').value;
+        const usuario = document.getElementById('usuario').value;
+        const detalhes = document.getElementById('detalhes').value;
 
-                status.style.display = 'block';
-                
-                if (result.sucesso) {
-                    status.className = 'sucesso';
-                    status.innerText = "✅ Email enviado! Aguarde nosso contato.";
-                    document.getElementById('form-esqueci').reset(); // Limpa o formulário
-                } else {
-                    status.className = 'erro';
-                    status.innerText = "❌ Erro ao enviar. Tente novamente.";
-                }
-
-            } catch (error) {
-                status.style.display = 'block';
-                status.className = 'erro';
-                status.innerText = "❌ Erro de conexão.";
-            } finally {
-                btn.innerText = "Enviar Solicitação";
-                btn.disabled = false;
-            }
+        // Validação: Nome e Usuário são obrigatórios
+        if (!nome || !usuario) {
+            alert("Por favor, preencha pelo menos seu nome e seu usuário.");
+            return;
         }
-    </script>
+
+        const numeroWhatsApp = "5541991227706";
+        
+        // Formatação da mensagem sem o campo de e-mail
+        const texto = `*SOLICITAÇÃO DE SUPORTE*%0A%0A` +
+                      `*Nome:* ${nome}%0A` +
+                      `*Usuário:* ${usuario}%0A` +
+                      `*Detalhes:* ${detalhes || 'Não informado'}`;
+
+        // Monta o link da API do WhatsApp
+        const url = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${texto}`;
+
+        // Abre o link
+        window.open(url, '_blank');
+    }
+</script>
 
 </body>
 </html>
