@@ -6,31 +6,144 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
     <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/login.css">
     
     <style>
-        /* Container para deixar o ícone em cima do input */
+        /* --- ESTILOS DO ANTIGO LOGIN.CSS --- */
+        
+        .caixa-login {
+            width: 350px;
+            padding: 40px;
+            
+            /* Efeito de Vidro (Glassmorphism) */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            
+            /* Centraliza a caixa na tela (caso o body não esteja fazendo isso) */
+            margin: auto;
+        }
+
+        .caixa-login h1 {
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            
+            /* Inputs transparentes */
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 50px;
+            background: white;
+            color: #4e54c8;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.5);
+        }
+
+        a:hover {
+            color: #e0e0e0;
+        }
+
+        /* --- ESTILOS ESPECÍFICOS DO OLHO E ERRO (Adicionados agora) --- */
+
+        /* Container para posicionar o ícone dentro dele */
         .input-com-icone {
             position: relative;
             width: 100%;
+            display: flex;
         }
 
-        /* O estilo do ícone */
+        /* Ajuste específico para input que tem ícone */
+        .input-com-icone input {
+            padding-right: 40px; /* Espaço para o ícone não cobrir o texto */
+        }
+
+        /* O estilo do ícone (olho) */
         .icone-olho {
             position: absolute;
             right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 50%; /* Tenta alinhar ao meio */
+            /* IMPORTANTE: O input tem margem bottom de 20px, então o "meio" visual muda.
+               Ajustei o transform para alinhar perfeitamente com a caixa de texto */
+            transform: translateY(-90%); 
             cursor: pointer;
-            /* Cor cinza para ficar profissional */
-            color: #757575; 
-            /* Impede de selecionar o ícone como texto */
+            color: rgba(255, 255, 255, 0.7); /* Cor combinando com o tema vidro */
             user-select: none;
+            font-size: 20px;
+            z-index: 10;
         }
         
-        /* Efeito hover para ficar mais escuro ao passar o mouse */
         .icone-olho:hover {
-            color: #424242;
+            color: white;
+        }
+
+        /* Estilo da mensagem de erro */
+        #msg-erro {
+            color: #ffcccc; /* Um vermelho claro para ler bem no fundo escuro */
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: -10px; /* Puxa um pouco pra cima */
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+            background-color: rgba(255, 0, 0, 0.1); /* Fundo vermelho transparente */
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -49,13 +162,15 @@
                 <span class="material-icons icone-olho" onclick="toggleSenha(this, 'senha')">visibility_off</span>
             </div>
 
-            <label style="margin-top: 10px; display: block;">Confirme a Senha</label>
+            <label>Confirme a Senha</label>
             <div class="input-com-icone">
                 <input type="password" id="confirma_senha" placeholder="Digite a senha novamente" required>
                 <span class="material-icons icone-olho" onclick="toggleSenha(this, 'confirma_senha')">visibility_off</span>
             </div>
+
+            <div id="msg-erro"></div>
             
-            <button type="submit" style="margin-top: 20px;">Cadastrar Agora</button>
+            <button type="submit">Cadastrar Agora</button>
         </form>
         
         <p style="margin-top: 20px; font-size: 13px;">
@@ -73,29 +188,38 @@
     </div>
 
     <script>
-        // Função para alternar o ícone e a visibilidade da senha
         function toggleSenha(elementoIcone, idCampo) {
             const campo = document.getElementById(idCampo);
-            
-            // Se está oculto (password) -> mostra (text) e muda o ícone para olho aberto
             if (campo.type === "password") {
                 campo.type = "text";
                 elementoIcone.textContent = 'visibility';
-            } 
-            // Se está visível (text) -> oculta (password) e muda o ícone para olho riscado
-            else {
+            } else {
                 campo.type = "password";
                 elementoIcone.textContent = 'visibility_off';
             }
         }
 
-        // Função de validação (continua a mesma)
         function validarSenhas() {
             var senha = document.getElementById("senha").value;
             var confirmacao = document.getElementById("confirma_senha").value;
+            var caixaErro = document.getElementById("msg-erro");
+
+            // Limpa erro anterior
+            caixaErro.style.display = "none";
+            caixaErro.innerText = "";
+
             if (senha !== confirmacao) {
-                alert("❌ Erro: As senhas não coincidem! Por favor, verifique.");
-                return false; 
+                caixaErro.innerText = "⚠️ As senhas não conferem!";
+                caixaErro.style.display = "block";
+                
+                // Animação de tremor
+                caixaErro.animate([
+                    { transform: 'translateX(-5px)' },
+                    { transform: 'translateX(5px)' },
+                    { transform: 'translateX(0)' }
+                ], { duration: 300 });
+
+                return false;
             }
             return true;
         }
