@@ -5,20 +5,55 @@
     <title>Nova Conta</title>
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/login.css">
+    
+    <style>
+        /* Container para deixar o ícone em cima do input */
+        .input-com-icone {
+            position: relative;
+            width: 100%;
+        }
+
+        /* O botão do olho */
+        .icone-olho {
+            position: absolute;
+            right: 10px; /* Fica no canto direito */
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none; /* Impede de selecionar o texto do ícone */
+            background: none;
+            border: none;
+            opacity: 0.6;
+        }
+
+        .icone-olho:hover {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
 
     <div class="caixa-login">
         <h1>Criar Conta</h1>
         
-        <form action="/cadastrar" method="POST">
+        <form action="/cadastrar" method="POST" onsubmit="return validarSenhas()">
             <label>Defina seu Usuário</label>
-            <input type="text" name="usuario" placeholder="Ex: murilo.dev" required>
+            <input type="text" name="usuario" placeholder="Nome de usuário" required>
             
             <label>Crie uma Senha</label>
-            <input type="password" name="senha" placeholder="Escolha uma senha forte" required>
+            <div class="input-com-icone">
+                <input type="password" id="senha" name="senha" placeholder="Sua senha secreta" required>
+                <span class="icone-olho" onclick="mostrarSenha('senha')">👁️</span>
+            </div>
+
+            <label style="margin-top: 10px; display: block;">Confirme a Senha</label>
+            <div class="input-com-icone">
+                <input type="password" id="confirma_senha" placeholder="Digite a senha novamente" required>
+                <span class="icone-olho" onclick="mostrarSenha('confirma_senha')">👁️</span>
+            </div>
             
-            <button type="submit">Cadastrar Agora</button>
+            <button type="submit" style="margin-top: 20px;">Cadastrar Agora</button>
         </form>
         
         <p style="margin-top: 20px; font-size: 13px;">
@@ -40,6 +75,32 @@
             <li class="caixa-flutuante"></li>
         </ul>
     </div>
+
+    <script>
+        // Função 1: Valida se as senhas são iguais ao tentar enviar
+        function validarSenhas() {
+            var senha = document.getElementById("senha").value;
+            var confirmacao = document.getElementById("confirma_senha").value;
+
+            if (senha !== confirmacao) {
+                alert("❌ Erro: As senhas não coincidem! Por favor, verifique.");
+                // Impede o envio do formulário
+                return false; 
+            }
+            // Se forem iguais, deixa o formulário ser enviado
+            return true;
+        }
+
+        // Função 2: Alterna entre mostrar e esconder a senha (tipo password <-> text)
+        function mostrarSenha(idCampo) {
+            var campo = document.getElementById(idCampo);
+            if (campo.type === "password") {
+                campo.type = "text";
+            } else {
+                campo.type = "password";
+            }
+        }
+    </script>
 
 </body>
 </html>
