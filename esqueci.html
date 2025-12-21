@@ -4,121 +4,202 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitação de Ajuda</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
     <style>
+        /* --- RESET BÁSICO --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* --- FUNDO DA TELA (Igual ao Cadastro/Login) --- */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
+            background: url('https://images.hdqwalls.com/wallpapers/bthumb/dark-night-mountains-minimalist-4k-o4.jpg') no-repeat center center/cover;
+            overflow: hidden;
         }
-        .container {
-            background-color: #111;
-            padding: 30px;
+
+        /* --- A CAIXA DE AJUDA (Vidro Escuro) --- */
+        .caixa-ajuda {
+            width: 400px;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 15px;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-            width: 100%;
-            max-width: 400px;
+            color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .caixa-ajuda h1 {
             text-align: center;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
         }
-        h2 { margin-bottom: 10px; }
-        p { color: #ccc; font-size: 14px; margin-bottom: 20px; }
-        .input-group { text-align: left; margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 14px; }
-        input, textarea {
+
+        .caixa-ajuda p {
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+        }
+
+        /* --- INPUTS E TEXTAREA --- */
+        .input-box {
+            position: relative;
             width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            background-color: #e8f0fe;
-            color: #000;
-            box-sizing: border-box;
+            margin-bottom: 20px;
         }
-        textarea {
-            background-color: #1a1a1a;
-            color: #fff;
+
+        .input-box input, .input-box textarea {
+            width: 100%;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 40px;
+            font-size: 15px;
+            color: white;
+            padding: 12px 45px 12px 20px;
+            outline: none;
+            transition: .3s;
+        }
+
+        /* Ajuste específico para a caixa de texto grande */
+        .input-box textarea {
+            border-radius: 20px;
             height: 100px;
             resize: none;
-            border: 1px solid #333;
         }
-        button {
+
+        .input-box input::placeholder, .input-box textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-box input:focus, .input-box textarea:focus {
+            border-color: white;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Ícones dentro do input */
+        .input-box .icone {
+            position: absolute;
+            right: 20px;
+            top: 15px; /* Ajustado para alinhar no topo da textarea tbm */
+            font-size: 20px;
+            color: white;
+        }
+
+        /* --- BOTÃO ESTILO WHATSAPP --- */
+        .btn-enviar {
             width: 100%;
-            padding: 15px;
-            border-radius: 25px;
+            height: 45px;
+            background: #25d366; /* Verde do WhatsApp para destaque */
             border: none;
-            background-color: #fff;
-            color: #000;
-            font-weight: bold;
+            outline: none;
+            border-radius: 40px;
             cursor: pointer;
-            margin-top: 15px;
-            transition: 0.3s;
+            font-size: 16px;
+            color: white;
+            font-weight: 700;
+            transition: .3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
-        button:hover { background-color: #ddd; }
-        .back-link {
-            display: block;
-            margin-top: 15px;
-            color: #fff;
-            text-decoration: none;
+
+        .btn-enviar:hover {
+            background: #1eb954;
+            transform: scale(1.02);
+        }
+
+        /* --- LINK VOLTAR --- */
+        .voltar-link {
             font-size: 14px;
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .voltar-link a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .voltar-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Solicitação de Ajuda</h2>
-    <p>Informe seus dados para recuperar o acesso à sua conta.</p>
-
-    <div class="input-group">
-        <label>Qual seu nome completo?</label>
-        <input type="text" id="nome" placeholder="Digite seu nome">
-    </div>
-
-    <div class="input-group">
-        <label>Qual seu usuário no sistema?</label>
-        <input type="text" id="usuario" placeholder="Digite seu usuário">
-    </div>
-
-    <div class="input-group">
-        <label>Detalhes do problema</label>
-        <textarea id="detalhes" placeholder="Ex: Esqueci minha senha e gostaria de resetar..."></textarea>
-    </div>
-
-    <button type="button" onclick="enviarParaWhatsApp()" id="btnEnviar">Enviar via WhatsApp</button>
-
-    <a href="/" class="back-link">Voltar para o Login</a>
-</div>
-
-<script>
-    function enviarParaWhatsApp() {
-        const nome = document.getElementById('nome').value;
-        const usuario = document.getElementById('usuario').value;
-        const detalhes = document.getElementById('detalhes').value;
-
-        // Validação: Nome e Usuário são obrigatórios
-        if (!nome || !usuario) {
-            alert("Por favor, preencha pelo menos seu nome e seu usuário.");
-            return;
-        }
-
-        const numeroWhatsApp = "5541991227706";
+    <div class="caixa-ajuda">
+        <h1>Suporte</h1>
+        <p>Enviaremos seus dados para o WhatsApp do suporte.</p>
         
-        // Formatação da mensagem sem o campo de e-mail
-        const texto = `*SOLICITAÇÃO DE SUPORTE*%0A%0A` +
-                      `*Nome:* ${nome}%0A` +
-                      `*Usuário:* ${usuario}%0A` +
-                      `*Detalhes:* ${detalhes || 'Não informado'}`;
+        <form>
+            <div class="input-box">
+                <input type="text" id="nome" placeholder="Seu nome completo" required>
+                <span class="material-icons icone">badge</span>
+            </div>
+            
+            <div class="input-box">
+                <input type="text" id="usuario" placeholder="Seu usuário" required>
+                <span class="material-icons icone">person</span>
+            </div>
 
-        // Monta o link da API do WhatsApp
-        const url = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${texto}`;
+            <div class="input-box">
+                <textarea id="detalhes" placeholder="Como podemos ajudar?"></textarea>
+                <span class="material-icons icone">edit</span>
+            </div>
+            
+            <button type="button" class="btn-enviar" onclick="enviarParaWhatsApp()">
+                <span class="material-icons">chat</span> Enviar via WhatsApp
+            </button>
 
-        // Abre o link
-        window.open(url, '_blank');
-    }
-</script>
+            <div class="voltar-link">
+                <a href="/">
+                    <span class="material-icons" style="font-size: 18px;">arrow_back</span> 
+                    Voltar para Login
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function enviarParaWhatsApp() {
+            const nome = document.getElementById('nome').value;
+            const usuario = document.getElementById('usuario').value;
+            const detalhes = document.getElementById('detalhes').value;
+
+            if (!nome || !usuario) {
+                alert("Por favor, preencha seu nome e usuário!");
+                return;
+            }
+
+            const numeroWhatsApp = "5541991227706";
+            
+            const texto = `*SOLICITAÇÃO DE SUPORTE*%0A%0A` +
+                          `*Nome:* ${nome}%0A` +
+                          `*Usuário:* ${usuario}%0A` +
+                          `*Problema:* ${detalhes || 'Esqueci minha senha'}`;
+
+            const url = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${texto}`;
+
+            window.open(url, '_blank');
+        }
+    </script>
 
 </body>
 </html>
