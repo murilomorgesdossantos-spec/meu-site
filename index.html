@@ -14,13 +14,12 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* --- FUNDO DA TELA (Sua Imagem Nova) --- */
+        /* --- FUNDO DA TELA --- */
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            /* Link da imagem atualizado aqui */
             background: url('https://images.hdqwalls.com/wallpapers/bthumb/dark-night-mountains-minimalist-4k-o4.jpg') no-repeat center center/cover;
             overflow: hidden;
         }
@@ -30,8 +29,8 @@
             width: 400px;
             padding: 40px;
             
-            background: rgba(0, 0, 0, 0.5); /* Preto transparente */
-            backdrop-filter: blur(10px);     /* Desfoque */
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             
             border: 2px solid rgba(255, 255, 255, 0.1);
@@ -91,23 +90,17 @@
             z-index: 10;
         }
 
-        /* --- LEMBRAR & ESQUECI --- */
+        /* --- CSS ALTERADO AQUI: APENAS O LINK CENTRALIZADO --- */
         .lembrar-esqueci {
-            display: flex;
-            justify-content: space-between;
+            text-align: center; /* Centraliza o texto/link */
             font-size: 14px;
             margin: -5px 0 20px;
-            padding: 0 10px;
-        }
-
-        .lembrar-esqueci label input {
-            margin-right: 5px;
-            accent-color: white;
         }
 
         .lembrar-esqueci a {
             color: white;
             text-decoration: none;
+            font-weight: 500; /* Um pouco mais de destaque */
         }
 
         .lembrar-esqueci a:hover {
@@ -170,14 +163,13 @@
             </div>
 
             <div class="lembrar-esqueci">
-                <label><input type="checkbox"> Lembrar-me</label>
                 <a href="#">Esqueceu sua senha?</a>
             </div>
 
-            <button type="submit" class="btn-login">Log in</button>
+            <button type="submit" class="btn-login">Entrar</button>
 
             <div class="registro-link">
-                <p>Não tem uma conta? <a href="/cadastro">Cadastre-se</a></p>
+                <p>Não possui uma conta? <a href="/cadastro">Cadastre-se</a></p>
             </div>
         </form>
     </div>
