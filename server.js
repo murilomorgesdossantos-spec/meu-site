@@ -14,18 +14,25 @@ app.use(express.static('public'));
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-// --- CONFIGURAÇÃO DE EMAIL (FORÇA BRUTA IPV4) ---
+// --- CONFIGURAÇÃO DE EMAIL BLINDADA ---
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,      // Voltamos para SSL (conexão imediata)
-    secure: true,   // Precisa ser true para porta 465
+    // Usamos 'googlemail' que às vezes responde melhor em nuvem
+    host: 'smtp.googlemail.com', 
+    port: 587,      // Porta 587 é a padrão para evitar bloqueios
+    secure: false,  // false para 587 (usa TLS depois de conectar)
     auth: {
         user: 'murilomorgesdossantos@gmail.com',
-        pass: process.env.EMAIL_PASSWORD
+        pass: process.env.EMAIL_PASSWORD // Senha do cofre
     },
-    // --- O SEGREDO ESTÁ AQUI EMBAIXO ---
-    family: 4,      // Obriga o servidor a usar IPv4 (ignora IPv6)
-    logger: true,   // Vai mostrar logs detalhados se der erro
+    // Força IPv4 e aceita certificados de segurança flexíveis
+    family: 4, 
+    tls: {
+        rejectUnauthorized: false,
+        ciphers: 'SSLv3' // Força compatibilidade máxima
+    },
+    // Tempo limite curto para não ficar esperando 2 minutos se der erro
+    connectionTimeout: 10000, 
+    logger: true,
     debug: true
 });
 
@@ -66,11 +73,11 @@ app.post('/enviar-ajuda', (req, res) => {
         to: 'murilomorgesdossantos@gmail.com',
         subject: 'Solicitação de Ajuda - Esqueci Minha Senha',
         text: `
-        SOLICITAÇÃO DE RECUPERAÇÃO DE CONTA
-        -----------------------------------
+        SOLICITAÇÃO DE RECUPERAÇÃO
+        --------------------------
         Nome: ${nome}
         Usuário: ${usuario}
-        Email de contato: ${email}
+        Email: ${email}
         
         Detalhes:
         ${detalhes}
@@ -79,10 +86,11 @@ app.post('/enviar-ajuda', (req, res) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.log("ERRO NO ENVIO:", error);
+            console.log("ERRO AO ENVIAR:", error);
+            // Retorna o erro exato
             return res.status(500).json({ sucesso: false, erro: error.toString() });
         } else {
-            console.log('EMAIL ENVIADO! ID: ' + info.messageId);
+            console.log('SUCESSO! Email enviado: ' + info.response);
             return res.json({ sucesso: true });
         }
     });
