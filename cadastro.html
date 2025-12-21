@@ -8,24 +8,18 @@
     <link rel="stylesheet" href="/style.css">
     
     <style>
-        /* --- ESTILOS DO ANTIGO LOGIN.CSS --- */
-        
+        /* --- ESTILOS (Mesmos do Login) --- */
         .caixa-login {
             width: 350px;
             padding: 40px;
-            
-            /* Efeito de Vidro (Glassmorphism) */
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            
             border-radius: 15px;
             text-align: center;
             color: white;
-            
-            /* Centraliza a caixa na tela (caso o body não esteja fazendo isso) */
             margin: auto;
         }
 
@@ -48,8 +42,6 @@
             padding: 12px;
             margin-bottom: 20px;
             box-sizing: border-box;
-            
-            /* Inputs transparentes */
             background: rgba(255, 255, 255, 0.2);
             border: none;
             border-radius: 5px;
@@ -98,30 +90,24 @@
             color: #e0e0e0;
         }
 
-        /* --- ESTILOS ESPECÍFICOS DO OLHO E ERRO (Adicionados agora) --- */
-
-        /* Container para posicionar o ícone dentro dele */
+        /* --- ESTILOS DO OLHO E ERRO --- */
         .input-com-icone {
             position: relative;
             width: 100%;
             display: flex;
         }
 
-        /* Ajuste específico para input que tem ícone */
         .input-com-icone input {
-            padding-right: 40px; /* Espaço para o ícone não cobrir o texto */
+            padding-right: 40px; 
         }
 
-        /* O estilo do ícone (olho) */
         .icone-olho {
             position: absolute;
             right: 10px;
-            top: 50%; /* Tenta alinhar ao meio */
-            /* IMPORTANTE: O input tem margem bottom de 20px, então o "meio" visual muda.
-               Ajustei o transform para alinhar perfeitamente com a caixa de texto */
-            transform: translateY(-90%); 
+            top: 50%; 
+            transform: translateY(-90%);
             cursor: pointer;
-            color: rgba(255, 255, 255, 0.7); /* Cor combinando com o tema vidro */
+            color: rgba(255, 255, 255, 0.7);
             user-select: none;
             font-size: 20px;
             z-index: 10;
@@ -131,16 +117,15 @@
             color: white;
         }
 
-        /* Estilo da mensagem de erro */
         #msg-erro {
-            color: #ffcccc; /* Um vermelho claro para ler bem no fundo escuro */
+            color: #ffcccc;
             font-size: 13px;
             font-weight: bold;
-            margin-top: -10px; /* Puxa um pouco pra cima */
+            margin-top: -10px;
             margin-bottom: 15px;
             text-align: center;
             display: none;
-            background-color: rgba(255, 0, 0, 0.1); /* Fundo vermelho transparente */
+            background-color: rgba(255, 0, 0, 0.1);
             padding: 8px;
             border-radius: 5px;
             border: 1px solid rgba(255, 0, 0, 0.2);
@@ -152,9 +137,9 @@
     <div class="caixa-login">
         <h1>Criar Conta</h1>
         
-        <form action="/cadastrar" method="POST" onsubmit="return validarSenhas()">
+        <form action="/cadastrar" method="POST" onsubmit="return validarTudo()">
             <label>Defina seu Usuário</label>
-            <input type="text" name="usuario" placeholder="Nome de usuário" required>
+            <input type="text" id="usuario" name="usuario" placeholder="Apenas letras e números" required>
             
             <label>Crie uma Senha</label>
             <div class="input-com-icone">
@@ -188,6 +173,7 @@
     </div>
 
     <script>
+        // Função para mostrar/esconder senha
         function toggleSenha(elementoIcone, idCampo) {
             const campo = document.getElementById(idCampo);
             if (campo.type === "password") {
@@ -199,29 +185,48 @@
             }
         }
 
-        function validarSenhas() {
+        // Função Principal de Validação
+        function validarTudo() {
+            var usuario = document.getElementById("usuario").value;
             var senha = document.getElementById("senha").value;
             var confirmacao = document.getElementById("confirma_senha").value;
-            var caixaErro = document.getElementById("msg-erro");
+            
+            // Regra: Usuário só pode ter letras (a-z) e números (0-9)
+            // ^ significa inicio, $ significa fim, [] são os caracteres permitidos
+            var regraUsuario = /^[a-zA-Z0-9]+$/;
 
-            // Limpa erro anterior
-            caixaErro.style.display = "none";
-            caixaErro.innerText = "";
-
-            if (senha !== confirmacao) {
-                caixaErro.innerText = "⚠️ As senhas não conferem!";
-                caixaErro.style.display = "block";
-                
-                // Animação de tremor
-                caixaErro.animate([
-                    { transform: 'translateX(-5px)' },
-                    { transform: 'translateX(5px)' },
-                    { transform: 'translateX(0)' }
-                ], { duration: 300 });
-
+            // 1. Validar Usuário (Sem espaço e sem especial)
+            if (!regraUsuario.test(usuario)) {
+                mostrarErro("O usuário não pode ter espaços ou símbolos!");
                 return false;
             }
-            return true;
+
+            // 2. Validar Senha (Sem espaço)
+            if (senha.includes(" ")) {
+                mostrarErro("A senha não pode conter espaços!");
+                return false;
+            }
+
+            // 3. Validar se as senhas conferem
+            if (senha !== confirmacao) {
+                mostrarErro("As senhas não coincidem!");
+                return false;
+            }
+
+            return true; // Se passou por tudo, deixa enviar
+        }
+
+        // Função ajudante para exibir o erro na tela
+        function mostrarErro(texto) {
+            var caixaErro = document.getElementById("msg-erro");
+            caixaErro.innerText = "⚠️ " + texto;
+            caixaErro.style.display = "block";
+            
+            caixaErro.animate([
+                { transform: 'translateX(-5px)' },
+                { transform: 'translateX(5px)' },
+                { transform: 'translateX(0)' }
+            ], { duration: 300 });
         }
     </script>
 
