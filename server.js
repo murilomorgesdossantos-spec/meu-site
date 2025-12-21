@@ -1,22 +1,29 @@
 const express = require('express');
 const { Pool } = require('pg');
 const path = require('path');
+const nodemailer = require('nodemailer'); // Importamos o carteiro
 
 const app = express();
 
-// Configuração do Banco de Dados (PostgreSQL)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: { rejectUnauthorized: false }
 });
 
 app.use(express.static('public')); 
-app.use(express.json()); // NECESSÁRIO para ler o JSON enviado pelo fetch
+app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-// Cria a Tabela se não existir
+// --- CONFIGURAÇÃO DO EMAIL (SUBSTITUA A SENHA DEPOIS) ---
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'murilomorgesdossantos@gmail.com', // Seu email
+        pass: 'uviq vrwx izkh aoaf' // <--- AQUI VAI PRECISAR DE UMA SENHA DE APP DO GOOGLE
+    }
+});
+
+// Banco de Dados
 pool.query(`
     CREATE TABLE IF NOT EXISTS usuarios (
         id SERIAL PRIMARY KEY,
@@ -24,61 +31,75 @@ pool.query(`
         senha TEXT
     )
 `, (err, res) => {
-    if (err) {
-        console.error('Erro ao criar tabela:', err);
-    } else {
-        // Cria admin padrão se não existir
-        pool.query(`
-            INSERT INTO usuarios (nome, senha) 
-            SELECT 'admin', '1234' 
-            WHERE NOT EXISTS (SELECT 1 FROM usuarios WHERE nome = 'admin')
-        `);
+    if (err) console.error('Erro tabela:', err);
+    else {
+        pool.query(`INSERT INTO usuarios (nome, senha) SELECT 'admin', '1234' WHERE NOT EXISTS (SELECT 1 FROM usuarios WHERE nome = 'admin')`);
     }
 });
 
-// Rotas de Páginas
+// --- ROTAS DE PÁGINAS ---
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'cadastro.html')));
-// Página do Sistema (após login) - Crie um arquivo sistema.html depois se quiser
+
+// ROTA NOVA: Exibe a tela de Esqueci a Senha
+app.get('/esqueci-senha', (req, res) => res.sendFile(path.join(__dirname, 'esqueci.html')));
+
 app.get('/sistema.html', (req, res) => res.send("<h1>Bem-vindo ao Sistema!</h1>")); 
 
 
-// --- ROTA DE LOGIN (MODIFICADA PARA JSON) ---
+// --- ROTA DE LOGIN ---
 app.post('/login', (req, res) => {
     const { usuario, senha } = req.body;
-    
     pool.query("SELECT * FROM usuarios WHERE nome = $1 AND senha = $2", [usuario, senha], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ sucesso: false, mensagem: "Erro no servidor" });
-        }
-        
-        const row = result.rows[0];
+        if (err) return res.status(500).json({ sucesso: false });
+        if (result.rows[0]) res.json({ sucesso: true });
+        else res.json({ sucesso: false });
+    });
+});
 
-        if (row) {
-            // Login Correto: Retorna JSON dizendo que deu certo
-            res.json({ sucesso: true });
+// --- ROTA DE ENVIAR EMAIL DE AJUDA ---
+app.post('/enviar-ajuda', (req, res) => {
+    const { nome, usuario, email, detalhes } = req.body;
+
+    // Configura o visual do email que vai chegar pra você
+    const mailOptions = {
+        from: email, // Quem está mandando (o email que a pessoa digitou)
+        to: 'murilomorgesdossantos@gmail.com', // Para quem vai (Você)
+        subject: 'Solicitação de Ajuda - Esqueci Minha Senha',
+        text: `
+        SOLICITAÇÃO DE RECUPERAÇÃO DE CONTA
+        
+        Nome completo: ${nome}
+        Usuario: ${usuario}
+        Email para contato: ${email}
+        
+        Detalhes do problema:
+        ${detalhes}
+        `
+    };
+
+    // Tenta enviar
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error);
+            return res.status(500).json({ sucesso: false, erro: error.toString() });
         } else {
-            // Login Errado: Retorna JSON dizendo que falhou
-            res.json({ sucesso: false });
+            console.log('Email enviado: ' + info.response);
+            return res.json({ sucesso: true });
         }
     });
 });
 
-// --- ROTA DE CADASTRO (MANTIDA, MAS AINDA MANDA HTML) ---
-// Se quiser modernizar o cadastro também, me avise depois.
+// --- ROTA DE CADASTRO ---
 app.post('/cadastrar', (req, res) => {
     const { usuario, senha } = req.body;
-
     pool.query("SELECT * FROM usuarios WHERE nome = $1", [usuario], (err, result) => {
-        if (err) return res.send("Erro no servidor");
-        
-        if (result.rows[0]) {
-            res.send("<h1>Usuário já existe! <a href='/cadastro'>Voltar</a></h1>");
-        } else {
+        if (err) return res.send("Erro");
+        if (result.rows[0]) res.send("Usuário já existe!");
+        else {
             pool.query("INSERT INTO usuarios (nome, senha) VALUES ($1, $2)", [usuario, senha], (err) => {
-                if (err) return res.send("Erro ao salvar");
-                res.redirect('/'); // Redireciona para o login após criar conta
+                if (err) return res.send("Erro");
+                res.redirect('/');
             });
         }
     });

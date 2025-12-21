@@ -42,11 +42,10 @@
         .lembrar-esqueci a { color: white; text-decoration: none; font-weight: 500; }
         .lembrar-esqueci a:hover { text-decoration: underline; }
 
-        /* --- MENSAGEM DE ERRO (NOVO) --- */
+        /* --- MENSAGEM DE ERRO --- */
         #msg-erro {
-            color: #ff6b6b; /* Vermelho claro */
-            font-size: 14px; font-weight: 600; text-align: center;
-            margin-bottom: 15px; display: none; /* Começa escondido */
+            color: #ff6b6b; font-size: 14px; font-weight: 600; text-align: center;
+            margin-bottom: 15px; display: none;
             background-color: rgba(255, 0, 0, 0.1); padding: 10px;
             border-radius: 10px; border: 1px solid rgba(255, 107, 107, 0.3);
         }
@@ -81,7 +80,7 @@
             </div>
 
             <div class="lembrar-esqueci">
-                <a href="#">Esqueceu sua senha?</a>
+                <a href="/esqueci-senha">Esqueceu sua senha?</a>
             </div>
 
             <div id="msg-erro"></div>
@@ -105,19 +104,14 @@
             }
         }
 
-        // --- NOVA LÓGICA DE LOGIN SEM RECARREGAR ---
         async function fazerLogin(event) {
-            event.preventDefault(); // Impede a página de recarregar sozinha
-
+            event.preventDefault(); 
             const usuario = document.getElementById('usuario').value;
             const senha = document.getElementById('senha_login').value;
             const msgErro = document.getElementById('msg-erro');
-
-            // Prepara os dados para enviar
             const dados = { usuario: usuario, senha: senha };
 
             try {
-                // Envia para o servidor "silenciosamente"
                 const resposta = await fetch('/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -127,14 +121,10 @@
                 const resultado = await resposta.json();
 
                 if (resultado.sucesso) {
-                    // SE DEU CERTO: Redireciona para o sistema
-                    window.location.href = "/sistema.html"; // ou a página que você usa
+                    window.location.href = "/sistema.html"; 
                 } else {
-                    // SE DEU ERRADO: Mostra o erro na mesma tela
                     msgErro.innerText = "⚠️ Usuário ou senha incorretos";
                     msgErro.style.display = "block";
-                    
-                    // Animaçãozinha de tremor
                     msgErro.animate([
                         { transform: 'translateX(-5px)' },
                         { transform: 'translateX(5px)' },
