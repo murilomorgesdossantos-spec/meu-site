@@ -2,14 +2,6 @@ const express = require('express');
 const { Pool } = require('pg');
 const path = require('path');
 const nodemailer = require('nodemailer');
-const dns = require('dns'); 
-
-// 1. OBRIGAR O NODE A USAR IPV4 (Evita travamentos de rede no Render)
-try {
-    dns.setDefaultResultOrder('ipv4first');
-} catch (e) {
-    console.log("Aviso: Node antigo, ignorando ajuste de DNS");
-}
 
 const app = express();
 
@@ -22,20 +14,19 @@ app.use(express.static('public'));
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-// 2. CONFIGURAÇÃO DE EMAIL ESPECÍFICA PARA NUVEM (PORTA 587)
+// --- CONFIGURAÇÃO DE EMAIL (FORÇA BRUTA IPV4) ---
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,              // Porta padrão para TLS (fura firewall)
-    secure: false,          // false para 587 (a segurança entra depois com STARTTLS)
+    port: 465,      // Voltamos para SSL (conexão imediata)
+    secure: true,   // Precisa ser true para porta 465
     auth: {
         user: 'murilomorgesdossantos@gmail.com',
-        pass: process.env.EMAIL_PASSWORD // Pega a senha do cofre
+        pass: process.env.EMAIL_PASSWORD
     },
-    tls: {
-        rejectUnauthorized: false // Ajuda a aceitar a conexão segura do Google
-    },
-    // Aumentamos o tempo limite para conexões lentas
-    connectionTimeout: 10000 
+    // --- O SEGREDO ESTÁ AQUI EMBAIXO ---
+    family: 4,      // Obriga o servidor a usar IPv4 (ignora IPv6)
+    logger: true,   // Vai mostrar logs detalhados se der erro
+    debug: true
 });
 
 // Banco de Dados
@@ -75,8 +66,8 @@ app.post('/enviar-ajuda', (req, res) => {
         to: 'murilomorgesdossantos@gmail.com',
         subject: 'Solicitação de Ajuda - Esqueci Minha Senha',
         text: `
-        SOLICITAÇÃO DE RECUPERAÇÃO
-        --------------------------
+        SOLICITAÇÃO DE RECUPERAÇÃO DE CONTA
+        -----------------------------------
         Nome: ${nome}
         Usuário: ${usuario}
         Email de contato: ${email}
@@ -88,11 +79,10 @@ app.post('/enviar-ajuda', (req, res) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.log("Erro no envio:", error);
-            // Retornamos o erro detalhado para o frontend se precisar
-            return res.status(500).json({ sucesso: false, erro: error.code || error.toString() });
+            console.log("ERRO NO ENVIO:", error);
+            return res.status(500).json({ sucesso: false, erro: error.toString() });
         } else {
-            console.log('Email enviado: ' + info.response);
+            console.log('EMAIL ENVIADO! ID: ' + info.messageId);
             return res.json({ sucesso: true });
         }
     });
