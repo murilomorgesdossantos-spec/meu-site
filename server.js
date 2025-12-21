@@ -2,10 +2,14 @@ const express = require('express');
 const { Pool } = require('pg');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const dns = require('dns'); // <--- 1. Importamos o módulo de DNS
+
+// --- 2. CORREÇÃO DO ERRO DE TIMEOUT (IPV4) ---
+// Isso obriga o Node v22 a usar o endereço IPv4 do Gmail, que não trava.
+dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
 
-// --- 1. CONFIGURAÇÃO DO BANCO DE DADOS ---
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -13,27 +17,20 @@ const pool = new Pool({
   }
 });
 
-// --- 2. MIDDLEWARES (Configurações do Express) ---
 app.use(express.static('public')); 
-app.use(express.json()); // Importante para ler JSON (Login e Email)
-app.use(express.urlencoded({ extended: true })); // Importante para ler Formulários (Cadastro)
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
 
-// --- 3. CONFIGURAÇÃO DO EMAIL (CORRIGIDA PARA RENDER) ---
-// Essa configuração específica evita o erro ETIMEDOUT no Render
+// --- 3. CONFIGURAÇÃO DE EMAIL (MODO SIMPLIFICADO & SEGURO) ---
+// Como corrigimos o DNS lá em cima, podemos usar o 'service: gmail' que é mais simples
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    service: 'gmail', 
     auth: {
-        user: 'murilomorgesdossantos@gmail.com', 
-        pass: process.env.EMAIL_PASSWORD
-    },
-    tls: {
-        rejectUnauthorized: false // Ajuda a passar pelo firewall do Render
+        user: 'murilomorgesdossantos@gmail.com',
+        pass: process.env.EMAIL_PASSWORD // Pega a senha do cofre do Render
     }
 });
 
-// --- 4. CRIAÇÃO DA TABELA (Se não existir) ---
 pool.query(`
     CREATE TABLE IF NOT EXISTS usuarios (
         id SERIAL PRIMARY KEY,
@@ -41,95 +38,72 @@ pool.query(`
         senha TEXT
     )
 `, (err, res) => {
-    if (err) {
-        console.error('Erro ao criar tabela:', err);
-    } else {
-        // Cria usuário admin padrão
-        pool.query(`
-            INSERT INTO usuarios (nome, senha) 
-            SELECT 'admin', '1234' 
-            WHERE NOT EXISTS (SELECT 1 FROM usuarios WHERE nome = 'admin')
-        `);
+    if (err) console.error('Erro tabela:', err);
+    else {
+        pool.query(`INSERT INTO usuarios (nome, senha) SELECT 'admin', '1234' WHERE NOT EXISTS (SELECT 1 FROM usuarios WHERE nome = 'admin')`);
     }
 });
 
-// --- 5. ROTAS DE PÁGINAS (Frontend) ---
+// --- ROTAS ---
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'cadastro.html')));
 app.get('/esqueci-senha', (req, res) => res.sendFile(path.join(__dirname, 'esqueci.html')));
 app.get('/sistema.html', (req, res) => res.send("<h1>Bem-vindo ao Sistema!</h1>")); 
 
-
-// --- 6. ROTA DE LOGIN (Retorna JSON) ---
 app.post('/login', (req, res) => {
     const { usuario, senha } = req.body;
-    
     pool.query("SELECT * FROM usuarios WHERE nome = $1 AND senha = $2", [usuario, senha], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ sucesso: false });
-        }
-        
-        const row = result.rows[0];
-
-        if (row) {
-            res.json({ sucesso: true });
-        } else {
-            res.json({ sucesso: false });
-        }
+        if (err) return res.status(500).json({ sucesso: false });
+        if (result.rows[0]) res.json({ sucesso: true });
+        else res.json({ sucesso: false });
     });
 });
 
-// --- 7. ROTA DE ENVIO DE EMAIL (Recuperação) ---
 app.post('/enviar-ajuda', (req, res) => {
     const { nome, usuario, email, detalhes } = req.body;
 
     const mailOptions = {
-        from: email, // Email que a pessoa digitou
-        to: 'murilomorgesdossantos@gmail.com', // Para VOCÊ
+        from: email,
+        to: 'murilomorgesdossantos@gmail.com',
         subject: 'Solicitação de Ajuda - Esqueci Minha Senha',
         text: `
         SOLICITAÇÃO DE RECUPERAÇÃO DE CONTA
         -----------------------------------
-        Nome completo: ${nome}
-        Usuário informado: ${usuario}
-        Email para contato: ${email}
+        Nome: ${nome}
+        Usuário: ${usuario}
+        Email de contato: ${email}
         
-        Detalhes do problema:
+        Detalhes:
         ${detalhes}
         `
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.log("Erro ao enviar email:", error);
+            console.log("Erro email:", error);
+            // Mostra o erro exato no console para a gente ver
             return res.status(500).json({ sucesso: false, erro: error.toString() });
         } else {
-            console.log('Email enviado com sucesso: ' + info.response);
+            console.log('Sucesso: ' + info.response);
             return res.json({ sucesso: true });
         }
     });
 });
 
-// --- 8. ROTA DE CADASTRO (Tradicional) ---
 app.post('/cadastrar', (req, res) => {
     const { usuario, senha } = req.body;
-
     pool.query("SELECT * FROM usuarios WHERE nome = $1", [usuario], (err, result) => {
-        if (err) return res.send("Erro no servidor");
-        
-        if (result.rows[0]) {
-            res.send("<h1>Usuário já existe! <a href='/cadastro'>Voltar</a></h1>");
-        } else {
+        if (err) return res.send("Erro");
+        if (result.rows[0]) res.send("Usuário já existe!");
+        else {
             pool.query("INSERT INTO usuarios (nome, senha) VALUES ($1, $2)", [usuario, senha], (err) => {
-                if (err) return res.send("Erro ao salvar");
-                res.redirect('/'); // Manda de volta pro login
+                if (err) return res.send("Erro");
+                res.redirect('/');
             });
         }
     });
 });
 
-// --- 9. INICIAR SERVIDOR ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
