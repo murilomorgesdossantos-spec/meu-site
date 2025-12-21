@@ -22,8 +22,8 @@ app.use(express.urlencoded({ extended: true })); // Importante para ler Formulá
 // Essa configuração específica evita o erro ETIMEDOUT no Render
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // false para porta 587 (usa STARTTLS)
+    port: 465,
+    secure: tre,
     auth: {
         user: 'murilomorgesdossantos@gmail.com', 
         pass: 'uviq vrwx izkh aoaf' // <--- COLE SUA SENHA DE 16 LETRAS AQUI (Mantenha as aspas)
