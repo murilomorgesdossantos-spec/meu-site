@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Nova Conta</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
     <style>
@@ -14,24 +14,23 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* --- FUNDO DA TELA (Sua Imagem Nova) --- */
+        /* --- FUNDO DA TELA --- */
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            /* Link da imagem atualizado aqui */
             background: url('https://images.hdqwalls.com/wallpapers/bthumb/dark-night-mountains-minimalist-4k-o4.jpg') no-repeat center center/cover;
             overflow: hidden;
         }
 
-        /* --- A CAIXA DE LOGIN (Vidro Escuro) --- */
+        /* --- A CAIXA DE CADASTRO (Vidro Escuro) --- */
         .caixa-login {
             width: 400px;
             padding: 40px;
             
-            background: rgba(0, 0, 0, 0.5); /* Preto transparente */
-            backdrop-filter: blur(10px);     /* Desfoque */
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             
             border: 2px solid rgba(255, 255, 255, 0.1);
@@ -77,6 +76,7 @@
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
         }
 
+        /* Ícones dentro do input */
         .input-box .icone {
             position: absolute;
             right: 20px;
@@ -91,30 +91,22 @@
             z-index: 10;
         }
 
-        /* --- LEMBRAR & ESQUECI --- */
-        .lembrar-esqueci {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin: -5px 0 20px;
-            padding: 0 10px;
+        /* --- MENSAGEM DE ERRO (Adaptada para o Dark) --- */
+        #msg-erro {
+            color: #ff6b6b; /* Um vermelho mais claro para ler no fundo escuro */
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+            background-color: rgba(255, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
         }
 
-        .lembrar-esqueci label input {
-            margin-right: 5px;
-            accent-color: white;
-        }
-
-        .lembrar-esqueci a {
-            color: white;
-            text-decoration: none;
-        }
-
-        .lembrar-esqueci a:hover {
-            text-decoration: underline;
-        }
-
-        /* --- BOTÃO DE LOGIN --- */
+        /* --- BOTÃO DE CADASTRAR --- */
         .btn-login {
             width: 100%;
             height: 45px;
@@ -135,7 +127,7 @@
             transform: scale(1.02);
         }
 
-        /* --- TEXTO DE CADASTRO --- */
+        /* --- LINK VOLTAR (Estilo Dark) --- */
         .registro-link {
             font-size: 14px;
             text-align: center;
@@ -156,44 +148,88 @@
 <body>
 
     <div class="caixa-login">
-        <form action="/login" method="POST">
-            <h1>Login</h1>
+        <form action="/cadastrar" method="POST" onsubmit="return validarTudo()">
+            <h1>Criar Conta</h1>
             
             <div class="input-box">
-                <input type="text" name="usuario" placeholder="Username" required>
+                <input type="text" id="usuario" name="usuario" placeholder="Usuário (letras, n° e _)" required>
                 <span class="material-icons icone">person</span>
             </div>
             
             <div class="input-box">
-                <input type="password" id="senha_login" name="senha" placeholder="Password" required>
-                <span class="material-icons icone icone-clicavel" onclick="toggleSenha()">visibility_off</span>
+                <input type="password" id="senha" name="senha" placeholder="Sua senha" required>
+                <span class="material-icons icone icone-clicavel" onclick="toggleSenha(this, 'senha')">visibility_off</span>
             </div>
 
-            <div class="lembrar-esqueci">
-                <label><input type="checkbox"> Remember me</label>
-                <a href="#">Forgot Password?</a>
+            <div class="input-box">
+                <input type="password" id="confirma_senha" placeholder="Confirme a senha" required>
+                <span class="material-icons icone icone-clicavel" onclick="toggleSenha(this, 'confirma_senha')">visibility_off</span>
             </div>
 
-            <button type="submit" class="btn-login">Log in</button>
+            <div id="msg-erro"></div>
+            
+            <button type="submit" class="btn-login">Cadastrar Agora</button>
 
             <div class="registro-link">
-                <p>Don't have an account? <a href="/cadastro">Register</a></p>
+                <p>Já tem uma conta? <a href="/">Fazer Login</a></p>
             </div>
         </form>
     </div>
 
     <script>
-        function toggleSenha() {
-            const campo = document.getElementById('senha_login');
-            const icone = document.querySelector('.icone-clicavel');
+        // Função do Olhinho (atualizada para funcionar com múltiplos campos)
+        function toggleSenha(elementoIcone, idCampo) {
+            const campo = document.getElementById(idCampo);
             
             if (campo.type === "password") {
                 campo.type = "text";
-                icone.textContent = 'visibility';
+                elementoIcone.textContent = 'visibility';
             } else {
                 campo.type = "password";
-                icone.textContent = 'visibility_off';
+                elementoIcone.textContent = 'visibility_off';
             }
+        }
+
+        // Sua lógica de validação original
+        function validarTudo() {
+            var usuario = document.getElementById("usuario").value;
+            var senha = document.getElementById("senha").value;
+            var confirmacao = document.getElementById("confirma_senha").value;
+            
+            var regraUsuario = /^[a-zA-Z0-9_]+$/;
+
+            // Valida Usuário
+            if (!regraUsuario.test(usuario)) {
+                mostrarErro("Usuário inválido! Use apenas letras, números e _");
+                return false;
+            }
+
+            // Valida Espaço na Senha
+            if (senha.includes(" ")) {
+                mostrarErro("A senha não pode conter espaços!");
+                return false;
+            }
+
+            // Valida Senhas Iguais
+            if (senha !== confirmacao) {
+                mostrarErro("As senhas não coincidem!");
+                return false;
+            }
+
+            return true;
+        }
+
+        function mostrarErro(texto) {
+            var caixaErro = document.getElementById("msg-erro");
+            caixaErro.innerText = "⚠️ " + texto;
+            caixaErro.style.display = "block";
+            
+            // Animação de tremor
+            caixaErro.animate([
+                { transform: 'translateX(-5px)' },
+                { transform: 'translateX(5px)' },
+                { transform: 'translateX(0)' }
+            ], { duration: 300 });
         }
     </script>
 
