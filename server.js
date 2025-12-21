@@ -2,35 +2,43 @@ const express = require('express');
 const { Pool } = require('pg');
 const path = require('path');
 const nodemailer = require('nodemailer');
-const dns = require('dns'); // <--- 1. Importamos o módulo de DNS
+const dns = require('dns'); 
 
-// --- 2. CORREÇÃO DO ERRO DE TIMEOUT (IPV4) ---
-// Isso obriga o Node v22 a usar o endereço IPv4 do Gmail, que não trava.
-dns.setDefaultResultOrder('ipv4first');
+// 1. OBRIGAR O NODE A USAR IPV4 (Evita travamentos de rede no Render)
+try {
+    dns.setDefaultResultOrder('ipv4first');
+} catch (e) {
+    console.log("Aviso: Node antigo, ignorando ajuste de DNS");
+}
 
 const app = express();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: { rejectUnauthorized: false }
 });
 
 app.use(express.static('public')); 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-// --- 3. CONFIGURAÇÃO DE EMAIL (MODO SIMPLIFICADO & SEGURO) ---
-// Como corrigimos o DNS lá em cima, podemos usar o 'service: gmail' que é mais simples
+// 2. CONFIGURAÇÃO DE EMAIL ESPECÍFICA PARA NUVEM (PORTA 587)
 const transporter = nodemailer.createTransport({
-    service: 'gmail', 
+    host: 'smtp.gmail.com',
+    port: 587,              // Porta padrão para TLS (fura firewall)
+    secure: false,          // false para 587 (a segurança entra depois com STARTTLS)
     auth: {
         user: 'murilomorgesdossantos@gmail.com',
-        pass: process.env.EMAIL_PASSWORD // Pega a senha do cofre do Render
-    }
+        pass: process.env.EMAIL_PASSWORD // Pega a senha do cofre
+    },
+    tls: {
+        rejectUnauthorized: false // Ajuda a aceitar a conexão segura do Google
+    },
+    // Aumentamos o tempo limite para conexões lentas
+    connectionTimeout: 10000 
 });
 
+// Banco de Dados
 pool.query(`
     CREATE TABLE IF NOT EXISTS usuarios (
         id SERIAL PRIMARY KEY,
@@ -44,7 +52,7 @@ pool.query(`
     }
 });
 
-// --- ROTAS ---
+// Rotas
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'cadastro.html')));
 app.get('/esqueci-senha', (req, res) => res.sendFile(path.join(__dirname, 'esqueci.html')));
@@ -67,8 +75,8 @@ app.post('/enviar-ajuda', (req, res) => {
         to: 'murilomorgesdossantos@gmail.com',
         subject: 'Solicitação de Ajuda - Esqueci Minha Senha',
         text: `
-        SOLICITAÇÃO DE RECUPERAÇÃO DE CONTA
-        -----------------------------------
+        SOLICITAÇÃO DE RECUPERAÇÃO
+        --------------------------
         Nome: ${nome}
         Usuário: ${usuario}
         Email de contato: ${email}
@@ -80,11 +88,11 @@ app.post('/enviar-ajuda', (req, res) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.log("Erro email:", error);
-            // Mostra o erro exato no console para a gente ver
-            return res.status(500).json({ sucesso: false, erro: error.toString() });
+            console.log("Erro no envio:", error);
+            // Retornamos o erro detalhado para o frontend se precisar
+            return res.status(500).json({ sucesso: false, erro: error.code || error.toString() });
         } else {
-            console.log('Sucesso: ' + info.response);
+            console.log('Email enviado: ' + info.response);
             return res.json({ sucesso: true });
         }
     });
