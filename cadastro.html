@@ -139,7 +139,7 @@
         
         <form action="/cadastrar" method="POST" onsubmit="return validarTudo()">
             <label>Defina seu Usuário</label>
-            <input type="text" id="usuario" name="usuario" placeholder="Apenas letras e números" required>
+            <input type="text" id="usuario" name="usuario" placeholder="Letras, números e _" required>
             
             <label>Crie uma Senha</label>
             <div class="input-com-icone">
@@ -173,7 +173,6 @@
     </div>
 
     <script>
-        // Função para mostrar/esconder senha
         function toggleSenha(elementoIcone, idCampo) {
             const campo = document.getElementById(idCampo);
             if (campo.type === "password") {
@@ -185,19 +184,21 @@
             }
         }
 
-        // Função Principal de Validação
         function validarTudo() {
             var usuario = document.getElementById("usuario").value;
             var senha = document.getElementById("senha").value;
             var confirmacao = document.getElementById("confirma_senha").value;
             
-            // Regra: Usuário só pode ter letras (a-z) e números (0-9)
-            // ^ significa inicio, $ significa fim, [] são os caracteres permitidos
-            var regraUsuario = /^[a-zA-Z0-9]+$/;
+            // ATENÇÃO AQUI: Adicionei o underline (_) na regra
+            // a-z = letras minúsculas
+            // A-Z = letras maiúsculas
+            // 0-9 = números
+            // _   = underline permitido
+            var regraUsuario = /^[a-zA-Z0-9_]+$/;
 
-            // 1. Validar Usuário (Sem espaço e sem especial)
+            // 1. Validar Usuário
             if (!regraUsuario.test(usuario)) {
-                mostrarErro("O usuário não pode ter espaços ou símbolos!");
+                mostrarErro("Usuário inválido! Use apenas letras, números e underline (_).");
                 return false;
             }
 
@@ -213,10 +214,9 @@
                 return false;
             }
 
-            return true; // Se passou por tudo, deixa enviar
+            return true;
         }
 
-        // Função ajudante para exibir o erro na tela
         function mostrarErro(texto) {
             var caixaErro = document.getElementById("msg-erro");
             caixaErro.innerText = "⚠️ " + texto;
