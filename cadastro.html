@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Nova Conta</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/login.css">
     
@@ -13,22 +15,22 @@
             width: 100%;
         }
 
-        /* O botão do olho */
+        /* O estilo do ícone */
         .icone-olho {
             position: absolute;
-            right: 10px; /* Fica no canto direito */
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            font-size: 18px;
-            user-select: none; /* Impede de selecionar o texto do ícone */
-            background: none;
-            border: none;
-            opacity: 0.6;
+            /* Cor cinza para ficar profissional */
+            color: #757575; 
+            /* Impede de selecionar o ícone como texto */
+            user-select: none;
         }
-
+        
+        /* Efeito hover para ficar mais escuro ao passar o mouse */
         .icone-olho:hover {
-            opacity: 1;
+            color: #424242;
         }
     </style>
 </head>
@@ -44,13 +46,13 @@
             <label>Crie uma Senha</label>
             <div class="input-com-icone">
                 <input type="password" id="senha" name="senha" placeholder="Sua senha secreta" required>
-                <span class="icone-olho" onclick="mostrarSenha('senha')">👁️</span>
+                <span class="material-icons icone-olho" onclick="toggleSenha(this, 'senha')">visibility_off</span>
             </div>
 
             <label style="margin-top: 10px; display: block;">Confirme a Senha</label>
             <div class="input-com-icone">
                 <input type="password" id="confirma_senha" placeholder="Digite a senha novamente" required>
-                <span class="icone-olho" onclick="mostrarSenha('confirma_senha')">👁️</span>
+                <span class="material-icons icone-olho" onclick="toggleSenha(this, 'confirma_senha')">visibility_off</span>
             </div>
             
             <button type="submit" style="margin-top: 20px;">Cadastrar Agora</button>
@@ -63,42 +65,39 @@
 
     <div class="area-animada">
         <ul style="padding: 0; margin: 0;">
-            <li class="caixa-flutuante"></li>
-            <li class="caixa-flutuante"></li>
-            <li class="caixa-flutuante"></li>
-            <li class="caixa-flutuante"></li>
-            <li class="caixa-flutuante"></li>
-            <li class="caixa-flutuante"></li>
-            <li class="caixa-flutuante"></li>
-            <li class="caixa-flutuante"></li>
-            <li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li><li class="caixa-flutuante"></li><li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li><li class="caixa-flutuante"></li><li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li><li class="caixa-flutuante"></li><li class="caixa-flutuante"></li>
             <li class="caixa-flutuante"></li>
         </ul>
     </div>
 
     <script>
-        // Função 1: Valida se as senhas são iguais ao tentar enviar
+        // Função para alternar o ícone e a visibilidade da senha
+        function toggleSenha(elementoIcone, idCampo) {
+            const campo = document.getElementById(idCampo);
+            
+            // Se está oculto (password) -> mostra (text) e muda o ícone para olho aberto
+            if (campo.type === "password") {
+                campo.type = "text";
+                elementoIcone.textContent = 'visibility';
+            } 
+            // Se está visível (text) -> oculta (password) e muda o ícone para olho riscado
+            else {
+                campo.type = "password";
+                elementoIcone.textContent = 'visibility_off';
+            }
+        }
+
+        // Função de validação (continua a mesma)
         function validarSenhas() {
             var senha = document.getElementById("senha").value;
             var confirmacao = document.getElementById("confirma_senha").value;
-
             if (senha !== confirmacao) {
                 alert("❌ Erro: As senhas não coincidem! Por favor, verifique.");
-                // Impede o envio do formulário
                 return false; 
             }
-            // Se forem iguais, deixa o formulário ser enviado
             return true;
-        }
-
-        // Função 2: Alterna entre mostrar e esconder a senha (tipo password <-> text)
-        function mostrarSenha(idCampo) {
-            var campo = document.getElementById(idCampo);
-            if (campo.type === "password") {
-                campo.type = "text";
-            } else {
-                campo.type = "password";
-            }
         }
     </script>
 
