@@ -1,11 +1,10 @@
 const express = require('express');
-const { Pool } = require('pg'); // Mudança 1: Usamos 'pg' em vez de 'sqlite3'
+const { Pool } = require('pg');
 const path = require('path');
 
 const app = express();
 
-// Mudança 2: Conexão com o banco do Render (PostgreSQL)
-// Ele pega o link automaticamente da variável de ambiente que configuramos
+// Configuração do Banco de Dados (PostgreSQL)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -14,10 +13,10 @@ const pool = new Pool({
 });
 
 app.use(express.static('public')); 
+app.use(express.json()); // NECESSÁRIO para ler o JSON enviado pelo fetch
 app.use(express.urlencoded({ extended: true }));
 
-// Mudança 3: Criação da Tabela (Adaptado para Postgres)
-// No Postgres usamos SERIAL para números automáticos e $1, $2 para variáveis
+// Cria a Tabela se não existir
 pool.query(`
     CREATE TABLE IF NOT EXISTS usuarios (
         id SERIAL PRIMARY KEY,
@@ -28,7 +27,7 @@ pool.query(`
     if (err) {
         console.error('Erro ao criar tabela:', err);
     } else {
-        // Cria o admin se ele não existir
+        // Cria admin padrão se não existir
         pool.query(`
             INSERT INTO usuarios (nome, senha) 
             SELECT 'admin', '1234' 
@@ -37,86 +36,49 @@ pool.query(`
     }
 });
 
-// --- Função para gerar o fundo animado (Nenhuma mudança aqui) ---
-function templateComFundo(conteudo) {
-    return `
-        <link rel="stylesheet" href="/style.css">
-        <link rel="stylesheet" href="/login.css">
-        <div class="caixa-login" style="margin: auto; margin-top: 50px;">
-            ${conteudo}
-        </div>
-        <div class="area-animada">
-            <ul style="padding: 0; margin: 0;">
-                <li class="caixa-flutuante"></li><li class="caixa-flutuante"></li>
-                <li class="caixa-flutuante"></li><li class="caixa-flutuante"></li>
-                <li class="caixa-flutuante"></li><li class="caixa-flutuante"></li>
-                <li class="caixa-flutuante"></li><li class="caixa-flutuante"></li>
-            </ul>
-        </div>
-    `;
-}
-
-// Rotas
+// Rotas de Páginas
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'cadastro.html')));
+// Página do Sistema (após login) - Crie um arquivo sistema.html depois se quiser
+app.get('/sistema.html', (req, res) => res.send("<h1>Bem-vindo ao Sistema!</h1>")); 
 
-// Rota de Login
+
+// --- ROTA DE LOGIN (MODIFICADA PARA JSON) ---
 app.post('/login', (req, res) => {
     const { usuario, senha } = req.body;
     
-    // Mudança 4: Query adaptada para Postgres ($1, $2 em vez de ?)
     pool.query("SELECT * FROM usuarios WHERE nome = $1 AND senha = $2", [usuario, senha], (err, result) => {
-        if (err) return res.send(templateComFundo("<h1>Erro no Sistema</h1>"));
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ sucesso: false, mensagem: "Erro no servidor" });
+        }
         
-        // No Postgres, os resultados ficam dentro de result.rows
         const row = result.rows[0];
 
         if (row) {
-            res.send(templateComFundo(`
-                <h1>Olá, ${row.nome}!</h1>
-                <p>Login realizado com sucesso.</p>
-                <br>
-                <a href="/">Sair</a>
-            `));
+            // Login Correto: Retorna JSON dizendo que deu certo
+            res.json({ sucesso: true });
         } else {
-            res.send(templateComFundo(`
-                <h1>Acesso Negado</h1>
-                <p>Usuário ou senha incorretos.</p>
-                <br>
-                <a href="/">Tentar Novamente</a>
-            `));
+            // Login Errado: Retorna JSON dizendo que falhou
+            res.json({ sucesso: false });
         }
     });
 });
 
-// Rota de Cadastro
+// --- ROTA DE CADASTRO (MANTIDA, MAS AINDA MANDA HTML) ---
+// Se quiser modernizar o cadastro também, me avise depois.
 app.post('/cadastrar', (req, res) => {
     const { usuario, senha } = req.body;
 
-    // Verifica se usuário existe
     pool.query("SELECT * FROM usuarios WHERE nome = $1", [usuario], (err, result) => {
-        if (err) return res.send("Erro no Sistema.");
+        if (err) return res.send("Erro no servidor");
         
-        const row = result.rows[0];
-
-        if (row) {
-            res.send(templateComFundo(`
-                <h1>Ops!</h1>
-                <p>O usuário <strong>${usuario}</strong> já existe.</p>
-                <br>
-                <a href="/cadastro">Tentar outro nome</a>
-            `));
+        if (result.rows[0]) {
+            res.send("<h1>Usuário já existe! <a href='/cadastro'>Voltar</a></h1>");
         } else {
-            // Insere novo usuário
             pool.query("INSERT INTO usuarios (nome, senha) VALUES ($1, $2)", [usuario, senha], (err) => {
-                if (err) return res.send("Erro ao salvar.");
-                
-                res.send(templateComFundo(`
-                    <h1>Sucesso!</h1>
-                    <p>Sua conta foi criada.</p>
-                    <br>
-                    <a href="/">Fazer Login</a>
-                `));
+                if (err) return res.send("Erro ao salvar");
+                res.redirect('/'); // Redireciona para o login após criar conta
             });
         }
     });
