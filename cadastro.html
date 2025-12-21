@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Conta</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/login.css">
+</head>
+<body>
+
+    <div class="caixa-login">
+        <h1>Criar Conta</h1>
+        
+        <form action="/cadastrar" method="POST">
+            <label>Defina seu Usuário</label>
+            <input type="text" name="usuario" placeholder="Ex: murilo.dev" required>
+            
+            <label>Crie uma Senha</label>
+            <input type="password" name="senha" placeholder="Escolha uma senha forte" required>
+            
+            <button type="submit">Cadastrar Agora</button>
+        </form>
+        
+        <p style="margin-top: 20px; font-size: 13px;">
+            <a href="/">← Voltar para Login</a>
+        </p>
+    </div>
+
+    <div class="area-animada">
+        <ul style="padding: 0; margin: 0;">
+            <li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li>
+            <li class="caixa-flutuante"></li>
+        </ul>
+    </div>
+
+</body>
+</html>
