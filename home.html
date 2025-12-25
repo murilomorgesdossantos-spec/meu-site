@@ -4,29 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Área Logada</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body {
             margin: 0;
-            padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             background: url('https://images.hdqwalls.com/wallpapers/bthumb/dark-night-mountains-minimalist-4k-o4.jpg') no-repeat center center/cover;
             font-family: 'Poppins', sans-serif;
             color: white;
+            gap: 20px;
         }
         h1 {
-            font-size: 50px;
+            font-size: 40px;
             background: rgba(0, 0, 0, 0.6);
-            padding: 20px 40px;
+            padding: 20px 50px;
             border-radius: 15px;
             backdrop-filter: blur(10px);
             border: 2px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .btn-sair {
+            background-color: #ff4b4b;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .btn-sair:hover {
+            background-color: #d43f3f;
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
-    <h1>Logado</h1>
+    <h1>Logado com Sucesso!</h1>
+    
+    <a href="/logout" class="btn-sair">
+        <span class="material-icons">logout</span> Sair do Sistema
+    </a>
 </body>
 </html>
