@@ -7,51 +7,58 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
             min-height: 100vh;
             background: url('https://images.hdqwalls.com/wallpapers/bthumb/dark-night-mountains-minimalist-4k-o4.jpg') no-repeat center center/cover;
-            font-family: 'Poppins', sans-serif;
-            color: white;
-            gap: 20px;
+            font-family: 'Poppins', sans-serif; color: white; gap: 20px;
         }
         h1 {
-            font-size: 40px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 20px 50px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            font-size: 40px; background: rgba(0, 0, 0, 0.6); padding: 20px 50px;
+            border-radius: 15px; backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.1);
+            text-align: center; box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
-        .btn-sair {
-            background-color: #ff4b4b;
-            color: white;
-            padding: 12px 30px;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
+        .btn {
+            padding: 12px 30px; text-decoration: none; border-radius: 30px; font-weight: bold;
+            display: flex; align-items: center; gap: 8px; transition: 0.3s;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: none; cursor: pointer; font-size: 16px;
         }
-        .btn-sair:hover {
-            background-color: #d43f3f;
-            transform: scale(1.05);
+        .btn-sair { background-color: #ff4b4b; color: white; }
+        .btn-sair:hover { background-color: #d43f3f; transform: scale(1.05); }
+
+        /* Botão Dourado do Admin - Começa invisível (display: none) */
+        #btn-admin {
+            background-color: #FFD700; color: #333; display: none; 
         }
+        #btn-admin:hover { background-color: #ffcc00; transform: scale(1.05); }
     </style>
 </head>
 <body>
-    <h1>Logado com Sucesso!</h1>
+    <h1 id="titulo-boasvindas">Logado com Sucesso!</h1>
     
-    <a href="/logout" class="btn-sair">
+    <a href="/admin" id="btn-admin" class="btn">
+        <span class="material-icons">security</span> Painel Admin
+    </a>
+
+    <a href="/logout" class="btn btn-sair">
         <span class="material-icons">logout</span> Sair do Sistema
     </a>
+
+    <script>
+        // Pergunta ao servidor quem está logado
+        fetch('/api/quem-sou-eu')
+            .then(res => res.json())
+            .then(data => {
+                // Atualiza o nome na tela
+                if (data.nome) {
+                    document.getElementById('titulo-boasvindas').innerText = `Olá, ${data.nome}!`;
+                }
+                
+                // SE FOR ADMIN,MOSTRA O BOTÃO DOURADO
+                if (data.admin === true) {
+                    document.getElementById('btn-admin').style.display = 'flex';
+                }
+            });
+    </script>
 </body>
 </html>

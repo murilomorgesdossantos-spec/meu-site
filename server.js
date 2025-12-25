@@ -4,89 +4,83 @@ const path = require('path');
 const session = require('express-session');
 
 const app = express();
-
-// --- CONEXÃO BANCO DE DADOS ---
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
-// Serve arquivos estáticos da pasta public (se houver) e da raiz
 app.use(express.static(path.join(__dirname, 'public'))); 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-// --- CONFIGURAÇÃO DE SESSÃO ---
 app.use(session({
-    secret: 'chave-secreta-do-murilo', 
+    secret: 'segredo-do-murilo', 
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 3600000 } // 1 hora
+    cookie: { maxAge: 3600000 }
 }));
 
-// --- ROTAS DAS PÁGINAS (Arquivos físicos) ---
+// --- ATUALIZAÇÃO AUTOMÁTICA DO BANCO ---
+// Tenta adicionar a coluna de admin e cria o usuário 'admin' padrão
+pool.query("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE", (err) => {
+    if (!err) {
+        // Garante que o usuário 'admin' seja Super Usuário
+        pool.query("UPDATE usuarios SET is_admin = TRUE WHERE nome = 'admin'");
+    }
+});
+
+// --- ROTAS DE PÁGINAS ---
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'cadastro.html')));
 app.get('/esqueci-senha', (req, res) => res.sendFile(path.join(__dirname, 'esqueci.html')));
 
-// --- ROTA PROTEGIDA HOME (COM CORREÇÃO DE DOWNLOAD) ---
+// Rota Home
 app.get('/home', (req, res) => {
     if (req.session.usuarioLogado) {
-        // ESSA LINHA É A MÁGICA: Obriga o navegador a renderizar o HTML
         res.setHeader('Content-Type', 'text/html');
-        
-        res.send(`
-            <!DOCTYPE html>
-            <html lang="pt-br">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Área Logada</title>
-                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-                <style>
-                    body {
-                        margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
-                        min-height: 100vh;
-                        background: url('https://images.hdqwalls.com/wallpapers/bthumb/dark-night-mountains-minimalist-4k-o4.jpg') no-repeat center center/cover;
-                        font-family: 'Poppins', sans-serif; color: white; gap: 20px;
-                    }
-                    h1 {
-                        font-size: 40px; background: rgba(0, 0, 0, 0.6); padding: 20px 50px;
-                        border-radius: 15px; backdrop-filter: blur(10px); border: 2px solid rgba(255, 255, 255, 0.1);
-                        text-align: center; box-shadow: 0 0 20px rgba(0,0,0,0.5);
-                    }
-                    .btn-sair {
-                        background-color: #ff4b4b; color: white; padding: 12px 30px; text-decoration: none;
-                        border-radius: 30px; font-weight: bold; display: flex; align-items: center; gap: 8px;
-                        transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-                    }
-                    .btn-sair:hover { background-color: #d43f3f; transform: scale(1.05); }
-                </style>
-            </head>
-            <body>
-                <h1>Bem-vindo, ${req.session.usuarioLogado}!</h1>
-                <a href="/logout" class="btn-sair"><span class="material-icons">logout</span> Sair do Sistema</a>
-            </body>
-            </html>
-        `);
+        res.sendFile(path.join(__dirname, 'home.html'));
     } else {
         res.redirect('/');
     }
 });
 
-// --- ROTA DE LOGOUT ---
+// Rota Exclusiva de Admin (Nova Página)
+app.get('/admin', (req, res) => {
+    // SÓ ENTRA SE TIVER LOGADO E FOR ADMIN
+    if (req.session.usuarioLogado && req.session.isAdmin) {
+        res.send('<h1>Bem-vindo à Área Secreta do Admin! 🕵️‍♂️</h1><a href="/home">Voltar</a>');
+    } else {
+        res.status(403).send('<h1>Acesso Negado! 🚫</h1><a href="/home">Voltar</a>');
+    }
+});
+
+// --- API PARA O FRONTEND SABER QUEM É O USUÁRIO ---
+app.get('/api/quem-sou-eu', (req, res) => {
+    if (req.session.usuarioLogado) {
+        res.json({ 
+            nome: req.session.usuarioLogado, 
+            admin: req.session.isAdmin || false 
+        });
+    } else {
+        res.json({ nome: null, admin: false });
+    }
+});
+
 app.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
 });
 
-// --- LOGIN ---
+// --- LOGIN ATUALIZADO ---
 app.post('/login', (req, res) => {
     const { usuario, senha } = req.body;
     pool.query("SELECT * FROM usuarios WHERE nome = $1 AND senha = $2", [usuario, senha], (err, result) => {
         if (err) return res.status(500).json({ sucesso: false });
+        
         if (result.rows.length > 0) {
             req.session.usuarioLogado = usuario;
+            // SALVA NA SESSÃO SE ELE É ADMIN OU NÃO
+            req.session.isAdmin = result.rows[0].is_admin; 
             res.json({ sucesso: true });
         } else {
             res.json({ sucesso: false });
@@ -94,10 +88,10 @@ app.post('/login', (req, res) => {
     });
 });
 
-// --- CADASTRO ---
 app.post('/cadastrar', (req, res) => {
     const { usuario, senha } = req.body;
-    pool.query("INSERT INTO usuarios (nome, senha) VALUES ($1, $2)", [usuario, senha], (err) => {
+    // Todo mundo nasce como usuário comum (FALSE)
+    pool.query("INSERT INTO usuarios (nome, senha, is_admin) VALUES ($1, $2, FALSE)", [usuario, senha], (err) => {
         if (err) return res.send("Erro ao cadastrar.");
         res.redirect('/');
     });
