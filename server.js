@@ -11,7 +11,7 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// Configuração para servir arquivos estáticos
+// Serve arquivos estáticos da pasta public (se houver) e da raiz
 app.use(express.static(path.join(__dirname, 'public'))); 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
@@ -29,10 +29,12 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'cadastro.html')));
 app.get('/esqueci-senha', (req, res) => res.sendFile(path.join(__dirname, 'esqueci.html')));
 
-// --- ROTA PROTEGIDA HOME (HTML EMBUTIDO) ---
-// Isso resolve o problema do download de arquivo vazio
+// --- ROTA PROTEGIDA HOME (COM CORREÇÃO DE DOWNLOAD) ---
 app.get('/home', (req, res) => {
     if (req.session.usuarioLogado) {
+        // ESSA LINHA É A MÁGICA: Obriga o navegador a renderizar o HTML
+        res.setHeader('Content-Type', 'text/html');
+        
         res.send(`
             <!DOCTYPE html>
             <html lang="pt-br">
