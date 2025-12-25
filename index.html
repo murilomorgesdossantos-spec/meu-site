@@ -2,141 +2,134 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Acesso Restrito</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
     <style>
-        /* --- RESET BÁSICO --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        /* --- RESET E ESTILO VISUAL --- */
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
 
-        /* --- FUNDO DA TELA --- */
         body {
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
             background: url('https://images.hdqwalls.com/wallpapers/bthumb/dark-night-mountains-minimalist-4k-o4.jpg') no-repeat center center/cover;
             overflow: hidden;
         }
 
-        /* --- CAIXA DE LOGIN --- */
         .caixa-login {
             width: 400px; padding: 40px;
-            background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 15px;
-            color: white; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
         }
 
-        .caixa-login h1 { text-align: center; font-size: 32px; margin-bottom: 30px; font-weight: 600; }
+        h1 { font-size: 32px; margin-bottom: 30px; font-weight: 600; }
 
         /* --- INPUTS --- */
-        .input-box { position: relative; width: 100%; height: 50px; margin-bottom: 20px; }
+        .input-box {
+            position: relative; width: 100%; height: 50px; margin-bottom: 20px;
+        }
+
         .input-box input {
             width: 100%; height: 100%; background: transparent;
-            border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 40px;
-            font-size: 16px; color: white; padding: 0 45px 0 20px; outline: none; transition: .3s;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 40px; font-size: 16px; color: white;
+            padding: 0 45px 0 20px; outline: none; transition: .3s;
         }
-        .input-box input::placeholder { color: rgba(255, 255, 255, 0.6); }
-        .input-box input:focus { border-color: white; box-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
-        .input-box .icone { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 20px; color: white; }
-        .input-box .icone-clicavel { cursor: pointer; z-index: 10; }
 
-        .lembrar-esqueci { text-align: center; font-size: 14px; margin: -5px 0 20px; }
-        .lembrar-esqueci a { color: white; text-decoration: none; font-weight: 500; }
-        .lembrar-esqueci a:hover { text-decoration: underline; }
+        .input-box input:focus { border-color: white; }
 
-        /* --- MENSAGEM DE ERRO --- */
-        #msg-erro {
-            color: #ff6b6b; font-size: 14px; font-weight: 600; text-align: center;
-            margin-bottom: 15px; display: none;
-            background-color: rgba(255, 0, 0, 0.1); padding: 10px;
-            border-radius: 10px; border: 1px solid rgba(255, 107, 107, 0.3);
+        .input-box .icone {
+            position: absolute; right: 20px; top: 50%;
+            transform: translateY(-50%); font-size: 20px;
         }
 
         /* --- BOTÃO --- */
         .btn-login {
-            width: 100%; height: 45px; background: white; border: none; outline: none;
-            border-radius: 40px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            cursor: pointer; font-size: 16px; color: #333; font-weight: 700; transition: .3s;
+            width: 100%; height: 45px; background: white;
+            border: none; border-radius: 40px; cursor: pointer;
+            font-size: 16px; color: #333; font-weight: 700; transition: .3s;
         }
-        .btn-login:hover { background: #f0f0f0; transform: scale(1.02); }
 
-        .registro-link { font-size: 14px; text-align: center; margin-top: 25px; }
-        .registro-link p a { color: white; text-decoration: none; font-weight: 600; }
-        .registro-link p a:hover { text-decoration: underline; }
+        .btn-login:hover { transform: scale(1.02); background: #f0f0f0; }
+
+        /* --- LINKS --- */
+        .links-auxiliares {
+            margin-top: 20px; font-size: 14px;
+            display: flex; justify-content: space-between;
+        }
+
+        .links-auxiliares a { color: white; text-decoration: none; font-weight: 500; }
+        .links-auxiliares a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <div class="caixa-login">
-        <form id="form-login" onsubmit="fazerLogin(event)">
-            <h1>Login</h1>
-            
-            <div class="input-box">
-                <input type="text" name="usuario" id="usuario" placeholder="Usuário" required>
-                <span class="material-icons icone">person</span>
-            </div>
-            
-            <div class="input-box">
-                <input type="password" name="senha" id="senha_login" placeholder="Senha" required>
-                <span class="material-icons icone icone-clicavel" onclick="toggleSenha()">visibility_off</span>
-            </div>
+        <h1>Login</h1>
+        
+        <div class="input-box">
+            <input type="text" id="usuario" placeholder="Usuário">
+            <span class="material-icons icone">person</span>
+        </div>
 
-            <div class="lembrar-esqueci">
-                <a href="/esqueci-senha">Esqueceu sua senha?</a>
-            </div>
+        <div class="input-box">
+            <input type="password" id="senha" placeholder="Senha">
+            <span class="material-icons icone">lock</span>
+        </div>
 
-            <div id="msg-erro"></div>
+        <button class="btn-login" onclick="fazerLogin()">Entrar</button>
 
-            <button type="submit" class="btn-login">Entrar</button>
-
-            <div class="registro-link">
-                <p>Não possui uma conta? <a href="/cadastro">Cadastre-se</a></p>
-            </div>
-        </form>
+        <div class="links-auxiliares">
+            <a href="/cadastro">Criar conta</a>
+            <a href="/esqueci-senha">Esqueci a senha</a>
+        </div>
     </div>
 
     <script>
-        function toggleSenha() {
-            const campo = document.getElementById('senha_login');
-            const icone = document.querySelector('.icone-clicavel');
-            if (campo.type === "password") {
-                campo.type = "text"; icone.textContent = 'visibility';
-            } else {
-                campo.type = "password"; icone.textContent = 'visibility_off';
-            }
-        }
-
-        async function fazerLogin(event) {
-            event.preventDefault(); 
+        function fazerLogin() {
             const usuario = document.getElementById('usuario').value;
-            const senha = document.getElementById('senha_login').value;
-            const msgErro = document.getElementById('msg-erro');
-            const dados = { usuario: usuario, senha: senha };
+            const senha = document.getElementById('senha').value;
 
-            try {
-                const resposta = await fetch('/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dados)
-                });
-
-                const resultado = await resposta.json();
-
-                if (resultado.sucesso) {
-                    window.location.href = "/sistema.html"; 
-                } else {
-                    msgErro.innerText = "⚠️ Usuário ou senha incorretos";
-                    msgErro.style.display = "block";
-                    msgErro.animate([
-                        { transform: 'translateX(-5px)' },
-                        { transform: 'translateX(5px)' },
-                        { transform: 'translateX(0)' }
-                    ], { duration: 300 });
-                }
-            } catch (error) {
-                console.error("Erro no login:", error);
-                msgErro.innerText = "⚠️ Erro no servidor. Tente mais tarde.";
-                msgErro.style.display = "block";
+            if (!usuario || !senha) {
+                alert("Preencha todos os campos!");
+                return;
             }
+
+            // Enviando para o servidor (Rota definida no server.js)
+            fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usuario, senha })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.sucesso) {
+                    // SE O LOGIN DER CERTO: O ticket de Session é criado no servidor
+                    // e o navegador redireciona para a página protegida.
+                    window.location.href = '/home'; 
+                } else {
+                    alert("Usuário ou senha incorretos!");
+                }
+            })
+            .catch(err => {
+                console.error("Erro no login:", err);
+                alert("Erro ao conectar com o servidor.");
+            });
         }
+
+        // Permitir dar "Enter" para logar
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') fazerLogin();
+        });
     </script>
 
 </body>
